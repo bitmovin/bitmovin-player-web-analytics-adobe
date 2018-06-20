@@ -1,0 +1,33 @@
+{
+  "name": "bitmovin-player-analytics-adobe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "serve": "http-server",
+    "wp-server": "webpack-dev-server --content-base public/",
+    "start": "concurrently --kill-others \"webpack --watch -d\" \"yarn run wp-server\"",
+    "doc": "typedoc --out docs/ --target ES6 --mode modules --module commonjs src/bitmovin-heartbeat.ts ",
+    "format": "prettier --single-quote --parser typescript --write 'src/*.ts'",
+    "precommit": "pretty-quick --staged"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "bitmovin-player": "7.5.8",
+    "bitmovin-player-ui": "^2.12.1",
+    "concurrently": "^3.5.1",
+    "husky": "^0.14.3",
+    "prettier": "^1.11.1",
+    "pretty-quick": "^1.4.1",
+    "ts-loader": "^4.0.1",
+    "typescript": "^2.7.2",
+    "webpack": "^4.1.1",
+    "webpack-cli": "^2.0.10",
+    "webpack-dev-server": "^3.1.0"
+  },
+  "dependencies": {
+    "typedoc": "^0.11.1"
+  }
+}
