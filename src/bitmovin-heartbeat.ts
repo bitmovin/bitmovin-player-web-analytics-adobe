@@ -194,6 +194,8 @@ export const HeartbeatAnalytics = function(
     >,
     p: PlayerAPI
   ) => () => {
+    const ON_SEEK = player.isLive ? EVENT.ON_TIME_SHIFT : EVENT.ON_SEEK;
+    const ON_SEEKED = player.isLive ? EVENT.ON_TIME_SHIFTED : EVENT.ON_SEEKED;
     const mediaObject = toCreateMediaObject(p);
     // TODO: player.getManifest()
     mediaHeartbeat.trackSessionStart(mediaObject, {});
@@ -209,8 +211,8 @@ export const HeartbeatAnalytics = function(
       toEventDataObj(EVENT.ON_STALL_STARTED, toOnBufferStart(mediaHeartbeat)),
       toEventDataObj(EVENT.ON_STALL_ENDED, toOnBufferEnd(mediaHeartbeat)),
       // Seeking
-      toEventDataObj(EVENT.ON_SEEK, toOnSeekStart(mediaHeartbeat)),
-      toEventDataObj(EVENT.ON_SEEKED, toOnSeekEnd(mediaHeartbeat)),
+      toEventDataObj(ON_SEEK, toOnSeekStart(mediaHeartbeat)),
+      toEventDataObj(ON_SEEKED, toOnSeekEnd(mediaHeartbeat)),
       // Ad related events
       toEventDataObj(
         EVENT.ON_AD_BREAK_STARTED,
@@ -276,7 +278,7 @@ export const HeartbeatAnalytics = function(
           player
         )
       ),
-      toEventDataObj(EVENT.ON_DESTROY, toOnVideoDestroy(mediaHeartbeat)),
+      toEventDataObj(EVENT.ON_DESTROY, toOnVideoDestroy(mediaHeartbeat))
     ]),
     bitrateState,
     startupDeltaState,
