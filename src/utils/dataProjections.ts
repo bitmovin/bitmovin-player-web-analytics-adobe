@@ -9,8 +9,15 @@ import { hasVideoPlaybackQuality, isSafari } from './helpers';
 const fromVideoPlaybackQualityWhenValid = (player: PlayerAPI) => {
   // NOTE: Although Safari implements the VideoPlaybackQuality object,
   // it only reports real data when using MSE (i.e. not for 'progressive'
-  // or 'hls', which are passed directly has video source) (CJP)
-  if (isSafari && player.getStreamType() !== 'dash')
+  // or 'hls', which are passed directly as video source) (CJP)
+  if (
+    // Bitmovin player defaults to using the native Safari player but can be configured
+    // to use a different tech (like HTML5). We only want to defer to the player API
+    // for dropped frames when using native to play HLS or progressive in Safari.
+    player.getPlayerType() === 'native' &&
+    isSafari &&
+    player.getStreamType() !== 'dash'
+  )
     return player.getDroppedFrames();
   const figureEl: HTMLElement = player.getFigure();
   if (!figureEl) return player.getDroppedFrames();
