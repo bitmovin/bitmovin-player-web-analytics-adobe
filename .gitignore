@@ -1,0 +1,8 @@
+.DS_Store
+.vscode
+**/node_modules
+**/bitmovin-heartbeat.js
+**/*.map
+yarn-error.log
+docs/**
+**/public
