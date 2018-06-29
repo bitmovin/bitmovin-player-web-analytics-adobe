@@ -24,7 +24,7 @@ import {
   toGetBitrate,
   toSourceFramerate,
   toOnAdBreakComplete,
-  toOnVideoDestroy,
+  onVideoDestroy,
   toOnBufferStart,
   toOnBufferEnd,
   toOnSeekStart,
@@ -240,7 +240,7 @@ export const HeartbeatAnalytics = function(
       toEventDataObj(EVENT.ON_ERROR, toOnError(mediaHeartbeat)),
       toEventDataObj(EVENT.ON_AD_ERROR, toOnAdError(mediaHeartbeat)),
       // Session End
-      toEventDataObj(EVENT.ON_SOURCE_UNLOADED, toOnVideoDestroy(mediaHeartbeat))
+      toEventDataObj(EVENT.ON_SOURCE_UNLOADED, onVideoDestroy(mediaHeartbeat))
     ]);
     allTeardowns = [...allTeardowns, ...teardowns];
   };
@@ -276,11 +276,13 @@ export const HeartbeatAnalytics = function(
           player
         )
       ),
-      toEventDataObj(EVENT.ON_DESTROY, toOnVideoDestroy(mediaHeartbeat)),
+      toEventDataObj(EVENT.ON_DESTROY, onVideoDestroy(mediaHeartbeat))
     ]),
     bitrateState,
     startupDeltaState,
-    [toOnVideoDestroy(mediaHeartbeat), {}]
+    // This is to make sure we end the session with HB in the case the implementer
+    // decides to teardown the HB analytics.
+    [onVideoDestroy(mediaHeartbeat), {}]
   ];
 
   // TODO: Cleanup ADB refs if necessary (CJP)

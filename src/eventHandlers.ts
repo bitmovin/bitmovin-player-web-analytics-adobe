@@ -251,5 +251,5 @@ export const toOnAdError = (mediaHeartbeat: MediaHeartbeat) => evt =>
   mediaHeartbeat.trackError(evt);
 
 // Session end
-export const toOnVideoDestroy = (mediaHeartbeat: MediaHeartbeat) => () =>
+export const onVideoDestroy = (mediaHeartbeat: MediaHeartbeat) =>
   mediaHeartbeat.trackSessionEnd;
