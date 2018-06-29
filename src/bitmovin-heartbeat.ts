@@ -250,12 +250,11 @@ export const HeartbeatAnalytics = function(
       ({ eventType, callback }) => {
         // NOTE: addPlayerEventHandler will have a side effect that, although not "observed"
         // relative to this map, still makes this not "pure" in the strict sense (CJP)
-        const boundCallback = callback.bind(mediaHeartbeat);
         return [
-          addPlayerEventHandler(player, eventType, boundCallback),
+          addPlayerEventHandler(player, eventType, callback),
           {
             eventType,
-            callback: boundCallback
+            callback
           }
         ];
       }
@@ -276,7 +275,7 @@ export const HeartbeatAnalytics = function(
           player
         )
       ),
-      toEventDataObj(EVENT.ON_DESTROY, toOnVideoDestroy(mediaHeartbeat)),
+      toEventDataObj(EVENT.ON_DESTROY, toOnVideoDestroy(mediaHeartbeat))
     ]),
     bitrateState,
     startupDeltaState,
