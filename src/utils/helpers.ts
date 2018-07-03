@@ -38,10 +38,10 @@ export const isSafari = /^((?!chrome|android).)*safari/i.test(
 export const hasVideoPlaybackQuality =
   typeof document.createElement('video').getVideoPlaybackQuality === 'function';
 
-const removeAtIndex = (arr: any[], i: number): any[] => [
-  ...arr.slice(0, i),
-  ...arr.slice(i + 1, arr.length)
-];
+const removeAtIndex = (arr: any[], i: number = -1): any[] => {
+  if (i === -1) return arr;
+  return [...arr.slice(0, i), ...arr.slice(i + 1, arr.length)];
+};
 
 export const hasPostAd = (player: bitmovin.PlayerAPI): Boolean => {
   const advertising = player.getConfig().advertising;
@@ -65,7 +65,7 @@ export const toGetManifest = (player: PlayerAPI): string | undefined => {
 /**
  * Invokes a Teardown Function in an array of Teardowns and returns a new array without the element
  */
-export const teardownAndRemove = (
+export const teardownAndRemoveAtIndex = (
   teardownArr: Teardown[],
   index: number
 ): Teardown[] => {
@@ -117,3 +117,13 @@ export function toCreateHeartbeatObject<W, X, Y, Z, T, E extends PlayerEvent>(
 ): PlayerWithItemProjection<T, E> {
   return (p, e) => f(h(p, e), i(p, e), j(p, e), k(p, e));
 }
+
+export const teardownAndRemove = (teardownArr: any[], event: EVENT) => {
+  const index = teardownArr.findIndex(
+    ([, { eventType = '' } = {}]) => eventType === event
+  );
+  if (index === -1) return teardownArr;
+  const [teardown] = teardownArr[index];
+  teardown();
+  return removeAtIndex(teardownArr, index);
+};

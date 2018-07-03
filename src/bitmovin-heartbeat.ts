@@ -6,7 +6,8 @@ import {
   MediaObject,
   AdBreakObject,
   AdObject,
-  ChapterObject
+  ChapterObject,
+  Event
 } from './types/Heartbeat';
 
 import {
@@ -52,7 +53,8 @@ import {
   toEventDataObj,
   toCreateHeartbeatObject,
   toGetValue,
-  hasPostAd
+  hasPostAd,
+  teardownAndRemove
 } from './utils/helpers';
 
 import {
@@ -176,8 +178,58 @@ export const HeartbeatAnalytics = function(
     });
   };
 
+  const onSeekStart = (mediaHeartbeat, player) => {
+    const events = {
+      start: player.isLive ? 'onTimeShift' : 'onSeek',
+      end: player.isLive ? 'onTimeShifted' : 'onSeeked'
+    };
+    const [{ onSeekCallback }] = allTeardowns.find(
+      ([, { eventType = '' } = {}]) => eventType === events.start
+    );
+    allTeardowns = teardownAndRemove(allTeardowns, events.start);
+    allTeardowns = [
+      ...allTeardowns,
+      ...toTeardownTuples([
+        toEventDataObj(events.end, () => {
+          mediaHeartbeat.trackEvent(Event.SeekComplete);
+          const thisTeardown = allTeardowns.find(
+            ([, { eventType = '' } = {}]) => eventType === events.end
+          );
+          thisTeardown();
+          allTeardowns = [
+            ...allTeardowns,
+            ...toTeardownTuples([toEventDataObj(events.start, onSeekCallback)])
+          ];
+        })
+      ])
+    ];
+  };
+
+  const onPlaying = (mediaHeartbeat, player) => {
+    const seekEvent = player.isLive ? EVENT.ON_TIME_SHIFT : EVENT.ON_SEEK;
+    const seekedEvent = player.isLive ? EVENT.ON_TIME_SHIFTED : EVENT.ON_SEEKED;
+    debugger;
+    const onSeekedIndex = allTeardowns.findIndex(
+      ([, { eventType = '' } = {}]) => eventType === seekedEvent
+    );
+    if (onSeekedIndex >= 0) {
+      mediaHeartbeat.trackEvent(Event.SeekComplete);
+      allTeardowns = teardownAndRemove(allTeardowns, seekedEvent);
+      allTeardowns = [
+        ...allTeardowns,
+        ...toTeardownTuples([
+          toEventDataObj(
+            seekEvent,
+            toOnSeekStart(mediaHeartbeat, player, onSeekStart)
+          )
+        ])
+      ];
+    }
+    mediaHeartbeat.trackPlay();
+  };
+
   /**
-   * @param p Bitmovin player instance
+   * @param player Bitmovin player instance
    *
    * Function called when player is ready.  This callback subscribes to all of the events from the
    * Bitmovin player needed for Adobe Heartbeats.
@@ -192,46 +244,52 @@ export const HeartbeatAnalytics = function(
       ChapterObject,
       ChapterEvent
     >,
-    p: PlayerAPI
+    player: PlayerAPI
   ) => () => {
     const ON_SEEK = player.isLive ? EVENT.ON_TIME_SHIFT : EVENT.ON_SEEK;
     const ON_SEEKED = player.isLive ? EVENT.ON_TIME_SHIFTED : EVENT.ON_SEEKED;
-    const mediaObject = toCreateMediaObject(p);
+    const mediaObject = toCreateMediaObject(player);
     // TODO: player.getManifest()
     mediaHeartbeat.trackSessionStart(mediaObject, {});
     const teardowns = toTeardownTuples([
       // Core Playback
-      toEventDataObj(EVENT.ON_PLAYING, onVideoPlay(mediaHeartbeat)),
+      toEventDataObj(
+        EVENT.ON_PLAYING,
+        onVideoPlay(mediaHeartbeat, player, onPlaying)
+      ),
       toEventDataObj(
         EVENT.ON_PLAYBACK_FINISHED,
-        toOnVideoComplete(mediaHeartbeat, p, toCreateMediaObject, finished)
+        toOnVideoComplete(mediaHeartbeat, player, toCreateMediaObject, finished)
       ),
       toEventDataObj(EVENT.ON_PAUSED, onVideoPause(mediaHeartbeat)),
       // Buffering
       toEventDataObj(EVENT.ON_STALL_STARTED, toOnBufferStart(mediaHeartbeat)),
       toEventDataObj(EVENT.ON_STALL_ENDED, toOnBufferEnd(mediaHeartbeat)),
       // Seeking
-      toEventDataObj(ON_SEEK, toOnSeekStart(mediaHeartbeat)),
-      toEventDataObj(ON_SEEKED, toOnSeekEnd(mediaHeartbeat)),
+      toEventDataObj(
+        ON_SEEK,
+        toOnSeekStart(mediaHeartbeat, player, onSeekStart)
+      ),
+      // toEventDataObj(EVENT.ON_SEEKED, toOnSeekEnd(mediaHeartbeat)),
       // Ad related events
       toEventDataObj(
         EVENT.ON_AD_BREAK_STARTED,
-        toOnAdBreakStart(mediaHeartbeat, p, toCreateAdBreakObject)
+        toOnAdBreakStart(mediaHeartbeat, player, toCreateAdBreakObject)
       ),
       toEventDataObj(
         EVENT.ON_AD_STARTED,
-        toOnAdStart(mediaHeartbeat, p, toCreateAdObject)
+        toOnAdStart(mediaHeartbeat, player, toCreateAdObject)
       ),
       toEventDataObj(EVENT.ON_AD_FINISHED, toOnAdComplete(mediaHeartbeat)),
       toEventDataObj(EVENT.ON_AD_SKIPPED, toOnAdSkip(mediaHeartbeat)),
       toEventDataObj(
         EVENT.ON_AD_BREAK_FINISHED,
-        toOnAdBreakComplete(mediaHeartbeat, p, finished)
+        toOnAdBreakComplete(mediaHeartbeat, player, finished)
       ),
       // Chapter and segment related events
       toEventDataObj(
         EVENT.ON_TIME_CHANGED,
-        checkChapter(mediaHeartbeat, p, toCreateChapterObject)
+        checkChapter(mediaHeartbeat, player, toCreateChapterObject)
       ),
       // Quality of service (QoS) related events
       toEventDataObj(

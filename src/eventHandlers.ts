@@ -17,7 +17,7 @@ import {
 
 import {
   hasPostAd,
-  teardownAndRemove,
+  teardownAndRemoveAtIndex,
   framerateMap,
   toGetStreamType,
   toGetManifest
@@ -80,7 +80,7 @@ export const toStartUpTime = (
     index: number
   ) => () => {
     callback();
-    teardowns = teardownAndRemove(teardownArr, index);
+    teardowns = teardownAndRemoveAtIndex(teardownArr, index);
   };
 
   //this unfortunately needs to be done this way since we cant get anything out of play callback
@@ -100,7 +100,7 @@ export const toStartUpTime = (
 
   const teardownAndRemoveAll = () => {
     while (teardowns.length) {
-      teardowns = teardownAndRemove(teardowns, 0);
+      teardowns = teardownAndRemoveAtIndex(teardowns, 0);
     }
   };
 
@@ -142,8 +142,13 @@ export const toSourceFramerate = (player: PlayerAPI): number | undefined => {
 };
 
 // Core playback
-export const onVideoPlay = (mediaHeartbeat: MediaHeartbeat) =>
-  mediaHeartbeat.trackPlay;
+export const onVideoPlay = (
+  mediaHeartbeat: MediaHeartbeat,
+  player: PlayerAPI,
+  onPlaying
+) => () => {
+  onPlaying(mediaHeartbeat, player);
+};
 export const onVideoPause = (mediaHeartbeat: MediaHeartbeat) =>
   mediaHeartbeat.trackPause;
 
@@ -202,8 +207,14 @@ export const toOnBufferEnd = (mediaHeartbeat: MediaHeartbeat) => () =>
   mediaHeartbeat.trackEvent(Event.BufferComplete);
 
 // Seeking
-export const toOnSeekStart = (mediaHeartbeat: MediaHeartbeat) => () =>
+export const toOnSeekStart = (
+  mediaHeartbeat: MediaHeartbeat,
+  player: PlayerAPI,
+  onSeekStart
+) => ({ type }) => {
   mediaHeartbeat.trackEvent(Event.SeekStart);
+  onSeekStart(mediaHeartbeat, player);
+};
 export const toOnSeekEnd = (mediaHeartbeat: MediaHeartbeat) => () =>
   mediaHeartbeat.trackEvent(Event.SeekComplete);
 
