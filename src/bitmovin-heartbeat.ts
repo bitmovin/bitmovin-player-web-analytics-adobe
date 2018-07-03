@@ -178,10 +178,23 @@ export const HeartbeatAnalytics = function(
     });
   };
 
+  const toOnSeekEnd = seekStartCallback => () => {
+    const seekEvent = player.isLive() ? EVENT.ON_TIME_SHIFT : EVENT.ON_SEEK;
+    const seekedEvent = player.isLive()
+      ? EVENT.ON_TIME_SHIFTED
+      : EVENT.ON_SEEKED;
+    mediaHeartbeat.trackEvent(Event.SeekComplete);
+    allTeardowns = teardownAndRemove(allTeardowns, seekedEvent);
+    allTeardowns = [
+      ...allTeardowns,
+      ...toTeardownTuples([toEventDataObj(seekEvent, seekStartCallback)])
+    ];
+  };
+
   const onSeekStart = (mediaHeartbeat, player) => {
     const events = {
-      start: player.isLive ? 'onTimeShift' : 'onSeek',
-      end: player.isLive ? 'onTimeShifted' : 'onSeeked'
+      start: player.isLive() ? 'onTimeShift' : 'onSeek',
+      end: player.isLive() ? 'onTimeShifted' : 'onSeeked'
     };
     const [{ onSeekCallback }] = allTeardowns.find(
       ([, { eventType = '' } = {}]) => eventType === events.start
@@ -190,40 +203,20 @@ export const HeartbeatAnalytics = function(
     allTeardowns = [
       ...allTeardowns,
       ...toTeardownTuples([
-        toEventDataObj(events.end, () => {
-          mediaHeartbeat.trackEvent(Event.SeekComplete);
-          const thisTeardown = allTeardowns.find(
-            ([, { eventType = '' } = {}]) => eventType === events.end
-          );
-          thisTeardown();
-          allTeardowns = [
-            ...allTeardowns,
-            ...toTeardownTuples([toEventDataObj(events.start, onSeekCallback)])
-          ];
-        })
+        toEventDataObj(events.end, toOnSeekEnd(onSeekCallback))
       ])
     ];
   };
 
   const onPlaying = (mediaHeartbeat, player) => {
-    const seekEvent = player.isLive ? EVENT.ON_TIME_SHIFT : EVENT.ON_SEEK;
-    const seekedEvent = player.isLive ? EVENT.ON_TIME_SHIFTED : EVENT.ON_SEEKED;
-    debugger;
+    const seekedEvent = player.isLive()
+      ? EVENT.ON_TIME_SHIFTED
+      : EVENT.ON_SEEKED;
     const onSeekedIndex = allTeardowns.findIndex(
       ([, { eventType = '' } = {}]) => eventType === seekedEvent
     );
     if (onSeekedIndex >= 0) {
-      mediaHeartbeat.trackEvent(Event.SeekComplete);
-      allTeardowns = teardownAndRemove(allTeardowns, seekedEvent);
-      allTeardowns = [
-        ...allTeardowns,
-        ...toTeardownTuples([
-          toEventDataObj(
-            seekEvent,
-            toOnSeekStart(mediaHeartbeat, player, onSeekStart)
-          )
-        ])
-      ];
+      toOnSeekEnd(toOnSeekStart(mediaHeartbeat, player, onSeekStart))();
     }
     mediaHeartbeat.trackPlay();
   };
@@ -246,8 +239,8 @@ export const HeartbeatAnalytics = function(
     >,
     player: PlayerAPI
   ) => () => {
-    const ON_SEEK = player.isLive ? EVENT.ON_TIME_SHIFT : EVENT.ON_SEEK;
-    const ON_SEEKED = player.isLive ? EVENT.ON_TIME_SHIFTED : EVENT.ON_SEEKED;
+    const ON_SEEK = player.isLive() ? EVENT.ON_TIME_SHIFT : EVENT.ON_SEEK;
+    const ON_SEEKED = player.isLive() ? EVENT.ON_TIME_SHIFTED : EVENT.ON_SEEKED;
     const mediaObject = toCreateMediaObject(player);
     // TODO: player.getManifest()
     mediaHeartbeat.trackSessionStart(mediaObject, {});
@@ -310,12 +303,11 @@ export const HeartbeatAnalytics = function(
       ({ eventType, callback }) => {
         // NOTE: addPlayerEventHandler will have a side effect that, although not "observed"
         // relative to this map, still makes this not "pure" in the strict sense (CJP)
-        const boundCallback = callback.bind(mediaHeartbeat);
         return [
-          addPlayerEventHandler(player, eventType, boundCallback),
+          addPlayerEventHandler(player, eventType, callback),
           {
             eventType,
-            callback: boundCallback
+            callback
           }
         ];
       }
