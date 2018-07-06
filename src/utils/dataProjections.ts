@@ -13,10 +13,9 @@ const fromVideoPlaybackQualityWhenValid = (player: PlayerAPI) => {
   if (
     // Bitmovin player defaults to using the native Safari player but can be configured
     // to use a different tech (like HTML5). We only want to defer to the player API
-    // for dropped frames when using native to play HLS or progressive in Safari.
+    // for dropped frames when using native to play content in Safari.
     player.getPlayerType() === 'native' &&
-    isSafari &&
-    player.getStreamType() !== 'dash'
+    isSafari
   )
     return player.getDroppedFrames();
   const figureEl: HTMLElement = player.getFigure();
