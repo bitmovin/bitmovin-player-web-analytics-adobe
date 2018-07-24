@@ -193,8 +193,8 @@ export const HeartbeatAnalytics = function(
 
   const onSeekStart = (mediaHeartbeat, player) => {
     const events = {
-      start: player.isLive() ? 'onTimeShift' : 'onSeek',
-      end: player.isLive() ? 'onTimeShifted' : 'onSeeked'
+      start: player.isLive() ? EVENT.ON_TIME_SHIFT : EVENT.ON_SEEK,
+      end: player.isLive() ? EVENT.ON_TIME_SHIFTED : EVENT.ON_SEEKED
     };
     const [{ onSeekCallback }] = allTeardowns.find(
       ([, { eventType = '' } = {}]) => eventType === events.start
