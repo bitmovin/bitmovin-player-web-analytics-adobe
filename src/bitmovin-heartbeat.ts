@@ -192,7 +192,7 @@ export const HeartbeatAnalytics = function(
       ChapterObject,
       ChapterEvent
     >,
-    p: PlayerAPI
+    player: PlayerAPI
   ) => () => {
     const ON_SEEK = player.isLive ? EVENT.ON_TIME_SHIFT : EVENT.ON_SEEK;
     const ON_SEEKED = player.isLive ? EVENT.ON_TIME_SHIFTED : EVENT.ON_SEEKED;
