@@ -12,15 +12,13 @@ import {
   FramerateProjectionDefault
 } from '../utils/framerate';
 
-import bitmovin, {
+import {
   PlayerAPI,
-  PlayerEvent,
-  StreamType,
   PlayerEventCallback,
-  EVENT
-} from '../types/bitmovin';
+  StreamType,
+  PlayerEvent
+} from 'bitmovin-player';
 
-const EVENT = bitmovin.player.EVENT;
 
 export const noop = () => {};
 
@@ -43,8 +41,8 @@ const removeAtIndex = (arr: any[], i: number): any[] => [
   ...arr.slice(i + 1, arr.length)
 ];
 
-export const hasPostAd = (player: bitmovin.PlayerAPI): Boolean => {
-  const advertising = player.getConfig().advertising;
+export const hasPostAd = (player: PlayerAPI): Boolean => {
+  const advertising = player.ads;
   const schedule = (advertising && advertising.schedule) || {};
   const offsets = Object.keys(schedule).map(ad => schedule[ad].offset);
   return !!offsets.filter(x => x === 'post').length;
@@ -82,7 +80,7 @@ export const framerateMap: Record<StreamType, FramerateProjection> = {
 };
 
 export const toEventDataObj = (
-  eventType: EVENT,
+  eventType: PlayerEvent,
   callback: PlayerEventCallback
 ): EventDataObj => ({
   eventType,

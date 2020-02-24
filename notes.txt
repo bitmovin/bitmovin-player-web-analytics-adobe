@@ -1,0 +1,25 @@
+Pending markers in /Users/thomashuertas/Documents/bitmovin/bitmovin-player-analytics-adobe/src/eventHandlers.ts(137,35)
+
+error:
+ERROR in /Users/thomashuertas/Documents/bitmovin/bitmovin-player-analytics-adobe/src/utils/dataProjections.ts
+./src/utils/dataProjections.ts
+[tsl] ERROR in /Users/thomashuertas/Documents/bitmovin/bitmovin-player-analytics-adobe/src/utils/dataProjections.ts(53,21)
+      TS2339: Property 'indexInQueue' does not exist on type 'AdEvent'.
+
+ERROR in /Users/thomashuertas/Documents/bitmovin/bitmovin-player-analytics-adobe/src/utils/dataProjections.ts
+./src/utils/dataProjections.ts
+[tsl] ERROR in /Users/thomashuertas/Documents/bitmovin/bitmovin-player-analytics-adobe/src/utils/dataProjections.ts(56,18)
+      TS2339: Property 'duration' does not exist on type 'AdEvent'.
+
+
+ERROR in /Users/thomashuertas/Documents/bitmovin/bitmovin-player-analytics-adobe/src/bitmovin-heartbeat.ts
+./src/bitmovin-heartbeat.ts
+[tsl] ERROR in /Users/thomashuertas/Documents/bitmovin/bitmovin-player-analytics-adobe/src/bitmovin-heartbeat.ts(215,9)
+      TS2345: Argument of type '(evt: PlayerEvent) => void' is not assignable to parameter of type 'PlayerEventCallback'.
+  Types of parameters 'evt' and 'event' are incompatible.
+    Type 'PlayerEventBase' is not assignable to type 'PlayerEvent'.
+
+ERROR in /Users/thomashuertas/Documents/bitmovin/bitmovin-player-analytics-adobe/src/bitmovin-heartbeat.ts
+./src/bitmovin-heartbeat.ts
+[tsl] ERROR in /Users/thomashuertas/Documents/bitmovin/bitmovin-player-analytics-adobe/src/bitmovin-heartbeat.ts(230,9)
+      TS2345: Argument of type 'void' is not assignable to parameter of type 'PlayerEventCallback'.

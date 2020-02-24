@@ -1,4 +1,3 @@
-import bitmovin from './bitmovin';
 
 export default interface HeartbeatDataProjections {
   toVideoUID: (player: bitmovin.PlayerAPI) => string;

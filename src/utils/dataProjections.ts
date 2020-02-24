@@ -1,4 +1,5 @@
-import { PlayerAPI, AdStartedEvent } from '../types/bitmovin';
+
+import { PlayerAPI,AdEvent} from 'bitmovin-player';
 
 import { ChapterEvent } from '../types/analytics';
 
@@ -17,26 +18,26 @@ const fromVideoPlaybackQualityWhenValid = (player: PlayerAPI) => {
     player.getPlayerType() === 'native' &&
     isSafari
   )
-    return player.getDroppedFrames();
-  const figureEl: HTMLElement = player.getFigure();
-  if (!figureEl) return player.getDroppedFrames();
+    return player.getDroppedVideoFrames();
+  const figureEl: HTMLElement = player.getContainer();
+  if (!figureEl) return player.getDroppedVideoFrames();
   // TODO: Verify that
   // a) querySelector will be available in all target browser &
   // b) we can assume that, if getFigure() is available, so is the video tag. (CJP)
   const videoEl: HTMLVideoElement = player
-    .getFigure()
+    .getContainer()
     .querySelector('video#bitmovinplayer-video-player');
-  if (!videoEl) return player.getDroppedFrames();
+  if (!videoEl) return player.getDroppedVideoFrames();
   return videoEl.getVideoPlaybackQuality().droppedVideoFrames;
 };
 
 export const toDroppedFrames = (player: PlayerAPI) => {
   if (hasVideoPlaybackQuality) return fromVideoPlaybackQualityWhenValid(player);
-  return player.getDroppedFrames();
+  return player.getDroppedVideoFrames();
 };
 
 export const toVideoTitle = (player: PlayerAPI) =>
-  player.getConfig().source.title;
+  player.getSource().title;
 
 export const toVideoDuration = (player: PlayerAPI) => player.getDuration();
 
@@ -48,11 +49,11 @@ export const toAdBreakStartTime = (player: PlayerAPI) =>
 
 export const toAdPosition = (
   player: PlayerAPI,
-  adStartedEvent: AdStartedEvent
-) => adStartedEvent.indexInQueue;
+  adStartedEvent: AdEvent
+) => adStartedEvent.timestamp; // original: adStartedEvent.indexInQueue;
 
-export const toAdLength = (player: PlayerAPI, adStartedEvent: AdStartedEvent) =>
-  adStartedEvent.duration;
+export const toAdLength = (player: PlayerAPI, adStartedEvent: AdEvent) =>
+adStartedEvent.timestamp; //original: //adStartedEvent.duration; 
 
 export const toChapterNameDefault = (player: PlayerAPI, e: ChapterEvent) =>
   e.title;
