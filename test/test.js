@@ -2,7 +2,7 @@ var TRACKING_SERVER = 'ADOBE d3 TRACKING SERVER' //'<organization-name>.d3.sc.om
 
 // Bitmovin player config object
 var conf = {
-  key: 'YOUR PLAYER KEY HERE',
+  key: '456747b9-c7e7-4832-aa2c-40a45a5da235',
   source: {
     title: 'Red Bull Parkour',
     dash:
