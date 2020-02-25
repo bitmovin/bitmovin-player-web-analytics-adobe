@@ -41,7 +41,7 @@ import {
 
 import HeartbeatDataProjections from './types/HeartbeatDataProjections';
 
-import { PlayerAPI,PlayerEvent, AdEvent} from 'bitmovin-player';
+import { PlayerAPI,PlayerEvent, AdBreakEvent, AdBreakConfig} from 'bitmovin-player';
 
 import { ChapterEvent } from './types/analytics';
 
@@ -185,7 +185,7 @@ export const HeartbeatAnalytics = function(
     mediaDelegate: MediaHeartbeatDelegate,
     toCreateMediaObject: PlayerWithItemProjection<MediaObject, {}>,
     toCreateAdBreakObject: PlayerWithItemProjection<AdBreakObject, PlayerEvent>,
-    toCreateAdObject: PlayerWithItemProjection<AdObject, AdEvent>,
+    toCreateAdObject: PlayerWithItemProjection<AdObject, AdBreakEvent>,
     toCreateChapterObject: PlayerWithItemProjection<
       ChapterObject,
       ChapterEvent

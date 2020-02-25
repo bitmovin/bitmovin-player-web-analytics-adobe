@@ -33,12 +33,15 @@ import {
     PlayerAPI,
     PlayerEventCallback,
     PlaybackEvent,
-    PlayerEventBase,
     PlayerEvent,
-    AdEvent,
-    LinearAd,
-    VideoPlaybackQualityChangedEvent
+    VideoPlaybackQualityChangedEvent,
+    AdBreakEvent
 } from 'bitmovin-player';
+
+import{
+    UIConfig, TimelineMarker
+}from 'bitmovin-player-ui/src/ts/uiconfig';
+
 
 /**
  * creates a Teardown function
@@ -132,11 +135,13 @@ export const toOnVideoComplete = (mediaHeartbeat : MediaHeartbeat, player : Play
 
 // Chapters and segments
 // TODO: Does PlaybackEvent provide actual seconds?
-export const checkChapter = (mediaHeartbeat : MediaHeartbeat, p : PlayerAPI, toCreateChapterObject : PlayerWithItemProjection < ChapterObject, ChapterEvent >) => {
+export const checkChapter = (mediaHeartbeat : MediaHeartbeat, p : PlayerAPI, toCreateChapterObject : PlayerWithItemProjection < ChapterObject, TimelineMarker >) => {
   
     let currentChapter;
-    /*const markers = p.getSource(),.markers || [];
-    const markersWithInterval: ChapterEvent[] = markers.map((m, position, a) => Object.assign({}, m, {
+    let uiConfig: UIConfig;
+    uiConfig= p.getConfig().ui;
+    const markers =  uiConfig.metadata.markers|| [];
+    const markersWithInterval = markers.map((m, position, a) => Object.assign({}, m, {
         position,
         interval: position === a.length - 1 ? [m.time, Number.POSITIVE_INFINITY] : [
             m.time,
@@ -157,7 +162,7 @@ export const checkChapter = (mediaHeartbeat : MediaHeartbeat, p : PlayerAPI, toC
     mediaHeartbeat.trackEvent(
       Event.ChapterStart, toCreateChapterObject(p, newChapter)
     );
-  };*/
+  };
 };
 
 // Buffering
@@ -171,7 +176,7 @@ export const toOnBufferStart = (mediaHeartbeat: MediaHeartbeat) => () => mediaHe
         // Ads
         export const toOnAdBreakStart = (mediaHeartbeat : MediaHeartbeat, p : PlayerAPI, toCreateAdBreakObject : PlayerWithItemProjection < AdBreakObject, PlayerEvent >) => (evt : PlayerEvent) => mediaHeartbeat.trackEvent(Event.AdBreakStart, toCreateAdBreakObject(p, evt));
 
-        export const toOnAdStart = (mediaHeartbeat : MediaHeartbeat, p : PlayerAPI, toCreateAdObject : PlayerWithItemProjection < AdObject, AdEvent >) => (evt : AdEvent) => mediaHeartbeat.trackEvent(Event.AdStart, toCreateAdObject(p, evt));
+        export const toOnAdStart = (mediaHeartbeat : MediaHeartbeat, p : PlayerAPI, toCreateAdObject : PlayerWithItemProjection < AdObject, AdBreakEvent >) => (evt : AdBreakEvent) => mediaHeartbeat.trackEvent(Event.AdStart, toCreateAdObject(p, evt));
 
         export const toOnAdComplete = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.AdComplete);
 

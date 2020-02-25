@@ -1,4 +1,4 @@
-import { PlayerAPI, PlayerEventCallback, EVENT } from './bitmovin';
+import { PlayerAPI,PlayerEvent, PlayerEventCallback } from 'bitmovin-player'
 /**
  * When invoked a Teardown function will remove an Event Handler
  */
@@ -25,6 +25,6 @@ export type ChapterEvent = {
  * Stores Event -> Function Bindings
  */
 export type EventDataObj = {
-  eventType: EVENT;
+  eventType: PlayerEvent;
   callback: PlayerEventCallback;
 };
