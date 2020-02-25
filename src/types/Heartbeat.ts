@@ -79,7 +79,7 @@ export interface CreateAdBreakObject {
 }
 
 export interface CreateAdObject {
-  (name: string, adId: string, position: number, duration: number): AdObject;
+  (name: string, adId: string, position: string, duration: string): AdObject;
 }
 
 export interface CreateChapterObject {
