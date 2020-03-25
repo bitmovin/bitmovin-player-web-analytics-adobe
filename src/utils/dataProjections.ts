@@ -1,5 +1,5 @@
 
-import { PlayerAPI,AdBreakEvent, AdBreakConfig, LinearAd} from 'bitmovin-player';
+import { PlayerAPI, AdBreakEvent, AdEvent} from 'bitmovin-player';
 
 import { ChapterEvent } from '../types/analytics';
 
@@ -53,7 +53,7 @@ export const toAdBreakStartTime = (player: PlayerAPI) =>
   ) =>  adStartedEvent.adBreak.scheduleTime.toString();
 
 export const toAdLength = (player: PlayerAPI, adStartedEvent: AdBreakEvent) =>
-adStartedEvent.adBreak.replaceContentDuration.toString(); 
+adStartedEvent.adBreak.replaceContentDuration.toString();
 
 export const toChapterNameDefault = (player: PlayerAPI, e: ChapterEvent) =>
   e.title;

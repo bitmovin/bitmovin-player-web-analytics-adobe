@@ -15,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "bitmovin-player": "^8.29.1",
+    "bitmovin-player": "^8.31.0",
     "bitmovin-player-ui": "^3.10.0",
     "concurrently": "^5.1.0",
     "husky": "^4.2.3",

@@ -20,27 +20,15 @@ import {
 
 import {toAdBreakNameDefault} from './utils/dataProjections';
 
-/*import bitmovin, {
-  PlayerAPI,
-  PlaybackEvent,
-  PlayerEventCallback,
-  VideoPlaybackQualityChangedEvent,
-  PlayerEvent,
-  AdStartedEvent
-} from './types/bitmovin';*/
-
 import {
     PlayerAPI,
-    PlayerEventCallback,
     PlaybackEvent,
     PlayerEvent,
+    PlayerEventCallback,
     VideoPlaybackQualityChangedEvent,
-    AdBreakEvent
+    AdBreakEvent,
+    AdEvent
 } from 'bitmovin-player';
-
-import{
-    UIConfig, TimelineMarker
-}from 'bitmovin-player-ui/src/ts/uiconfig';
 
 
 /**
@@ -135,64 +123,64 @@ export const toOnVideoComplete = (mediaHeartbeat : MediaHeartbeat, player : Play
 
 // Chapters and segments
 // TODO: Does PlaybackEvent provide actual seconds?
-export const checkChapter = (mediaHeartbeat : MediaHeartbeat, p : PlayerAPI, toCreateChapterObject : PlayerWithItemProjection < ChapterObject, TimelineMarker >) => {
-  
-    let currentChapter;
-    let uiConfig: UIConfig;
-    uiConfig= p.getConfig().ui;
-    const markers =  uiConfig.metadata.markers|| [];
-    const markersWithInterval = markers.map((m, position, a) => Object.assign({}, m, {
-        position,
-        interval: position === a.length - 1 ? [m.time, Number.POSITIVE_INFINITY] : [
-            m.time,
-            a[position + 1].time
-        ]
-      }));
+export const checkChapter = (mediaHeartbeat : MediaHeartbeat, p : PlayerAPI, toCreateChapterObject : PlayerWithItemProjection < ChapterObject, ChapterEvent >) => {
 
-    return({time} : PlaybackEvent) => {
-        const newChapter = markersWithInterval.find(({
-            interval: [start, end]
-        }) => start<= Math.floor(time) && Math.floor(time) < end
-    );
-    if (!newChapter || newChapter === currentChapter) return;
-    if (currentChapter && newChapter !== markersWithInterval[0])
-      mediaHeartbeat.trackEvent(Event.ChapterComplete);
-    //TODO: Deal with Event.ChapterSkip
-    currentChapter = newChapter;
-    mediaHeartbeat.trackEvent(
-      Event.ChapterStart, toCreateChapterObject(p, newChapter)
-    );
-  };
+    let currentChapter;
+    const markers = p.getConfig().ui.metadata.markers || [];
+    const markersWithInterval: ChapterEvent[] = markers.map((m, position, a) => Object.assign({}, m, {
+    position,
+    interval: position === a.length - 1 ? [m.time, Number.POSITIVE_INFINITY] : [
+        m.time,
+        a[position + 1].time
+    ]
+  }));
+
+return({time} : PlaybackEvent) => {
+    const newChapter = markersWithInterval.find(({
+        interval: [start, end]
+    }) => start<= Math.floor(time) && Math.floor(time) < end
+);
+if (!newChapter || newChapter === currentChapter) return;
+if (currentChapter && newChapter !== markersWithInterval[0])
+  mediaHeartbeat.trackEvent(Event.ChapterComplete);
+//TODO: Deal with Event.ChapterSkip
+currentChapter = newChapter;
+mediaHeartbeat.trackEvent(
+  Event.ChapterStart, toCreateChapterObject(p, newChapter)
+);
+};
 };
 
 // Buffering
 export const toOnBufferStart = (mediaHeartbeat: MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.BufferStart);
-        export const toOnBufferEnd = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.BufferComplete);
 
-        // Seeking
-            export const toOnSeekStart = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.SeekStart);
-        export const toOnSeekEnd = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.SeekComplete);
+export const toOnBufferEnd = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.BufferComplete);
 
-        // Ads
-        export const toOnAdBreakStart = (mediaHeartbeat : MediaHeartbeat, p : PlayerAPI, toCreateAdBreakObject : PlayerWithItemProjection < AdBreakObject, PlayerEvent >) => (evt : PlayerEvent) => mediaHeartbeat.trackEvent(Event.AdBreakStart, toCreateAdBreakObject(p, evt));
+// Seeking
+export const toOnSeekStart = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.SeekStart);
 
-        export const toOnAdStart = (mediaHeartbeat : MediaHeartbeat, p : PlayerAPI, toCreateAdObject : PlayerWithItemProjection < AdObject, AdBreakEvent >) => (evt : AdBreakEvent) => mediaHeartbeat.trackEvent(Event.AdStart, toCreateAdObject(p, evt));
+export const toOnSeekEnd = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.SeekComplete);
 
-        export const toOnAdComplete = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.AdComplete);
+// Ads
+export const toOnAdBreakStart = (mediaHeartbeat : MediaHeartbeat, player : PlayerAPI, toCreateAdBreakObject : PlayerWithItemProjection <AdBreakObject, AdBreakEvent>) => (evt : AdBreakEvent) => mediaHeartbeat.trackEvent(Event.AdBreakStart, toCreateAdBreakObject(player, evt));
 
-        export const toOnAdSkip = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.AdSkip);
+export const toOnAdStart = (mediaHeartbeat : MediaHeartbeat, player : PlayerAPI, toCreateAdObject : PlayerWithItemProjection <AdObject, AdBreakEvent>) => (evt : AdBreakEvent) => mediaHeartbeat.trackEvent(Event.AdStart, toCreateAdObject(player, evt));
 
-        export const toOnAdBreakComplete = (mediaHeartbeat : MediaHeartbeat, player : PlayerAPI, finished : () => void) => () => {
-            mediaHeartbeat.trackEvent(Event.AdBreakComplete);
-            if (toAdBreakNameDefault(player) === 'post') {
-                finished();
-            }
-        };
+export const toOnAdComplete = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.AdComplete);
 
-        // QoS
-            export const toOnVideoQualityChanged = (mediaHeartbeat : MediaHeartbeat, mediaDelegate : MediaHeartbeatDelegate) => () => mediaHeartbeat.trackEvent(Event.BitrateChange, mediaDelegate.getQoSObject());
-        export const toOnError = (mediaHeartbeat : MediaHeartbeat) => evt => mediaHeartbeat.trackError(evt);
-        export const toOnAdError = (mediaHeartbeat : MediaHeartbeat) => evt => mediaHeartbeat.trackError(evt);
+export const toOnAdSkip = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.AdSkip);
 
-        // Session end
-            export const toOnVideoDestroy = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackSessionEnd;
+export const toOnAdBreakComplete = (mediaHeartbeat : MediaHeartbeat, player : PlayerAPI, finished : () => void) => () => {
+mediaHeartbeat.trackEvent(Event.AdBreakComplete);
+if (toAdBreakNameDefault(player) === 'post') {
+    finished();
+}
+};
+
+// QoS
+export const toOnVideoQualityChanged = (mediaHeartbeat : MediaHeartbeat, mediaDelegate : MediaHeartbeatDelegate) => () => mediaHeartbeat.trackEvent(Event.BitrateChange, mediaDelegate.getQoSObject());
+export const toOnError = (mediaHeartbeat : MediaHeartbeat) => evt => mediaHeartbeat.trackError(evt);
+export const toOnAdError = (mediaHeartbeat : MediaHeartbeat) => evt => mediaHeartbeat.trackError(evt);
+
+// Session end
+export const toOnVideoDestroy = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackSessionEnd;
