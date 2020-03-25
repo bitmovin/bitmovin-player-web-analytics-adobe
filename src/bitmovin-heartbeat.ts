@@ -41,11 +41,11 @@ import {
 
 import HeartbeatDataProjections from './types/HeartbeatDataProjections';
 
-import { PlayerAPI,PlayerEvent, AdBreakEvent, AdBreakConfig} from 'bitmovin-player';
+import { PlayerAPI, PlayerEvent, AdBreakEvent, AdEvent } from 'bitmovin-player';
 
 import { ChapterEvent } from './types/analytics';
 
-import { MediaHeartbeatPass } from './dev/adobePassthrough';
+import { MediaHeartbeatStub } from './dev/adobeStub';
 
 import {
   noop,
@@ -149,7 +149,7 @@ export const HeartbeatAnalytics = function(
   /**
    * Create MediaHeartbeat instance
    */
-  const mediaHeartbeat = new MediaHeartbeatPass(
+  const mediaHeartbeat = new MediaHeartbeatStub(
     mediaDelegate,
     mediaConfigObj,
     appMeasurement
@@ -184,15 +184,12 @@ export const HeartbeatAnalytics = function(
     mediaHeartbeat: MediaHeartbeat,
     mediaDelegate: MediaHeartbeatDelegate,
     toCreateMediaObject: PlayerWithItemProjection<MediaObject, {}>,
-    toCreateAdBreakObject: PlayerWithItemProjection<AdBreakObject, PlayerEvent>,
+    toCreateAdBreakObject: PlayerWithItemProjection<AdBreakObject, AdBreakEvent>,
     toCreateAdObject: PlayerWithItemProjection<AdObject, AdBreakEvent>,
-    toCreateChapterObject: PlayerWithItemProjection<
-      ChapterObject,
-      ChapterEvent
-    >,
-    p: PlayerAPI
+    toCreateChapterObject: PlayerWithItemProjection<ChapterObject, ChapterEvent>,
+    player: PlayerAPI
   ) => () => {
-    const mediaObject = toCreateMediaObject(p);
+    const mediaObject = toCreateMediaObject(player);
     // TODO: player.getManifest()
     mediaHeartbeat.trackSessionStart(mediaObject, {});
     const teardowns = toTeardownTuples([
@@ -200,7 +197,7 @@ export const HeartbeatAnalytics = function(
       toEventDataObj(PlayerEvent.Playing, onVideoPlay(mediaHeartbeat)),
       toEventDataObj(
         PlayerEvent.PlaybackFinished,
-        toOnVideoComplete(mediaHeartbeat, p, toCreateMediaObject, finished)
+        toOnVideoComplete(mediaHeartbeat, player, toCreateMediaObject, finished)
       ),
       toEventDataObj(PlayerEvent.Paused, onVideoPause(mediaHeartbeat)),
       // Buffering
@@ -212,22 +209,22 @@ export const HeartbeatAnalytics = function(
       // Ad related events
       toEventDataObj(
         PlayerEvent.AdBreakStarted,
-        /*toOnAdBreakStart(mediaHeartbeat, p, toCreateAdBreakObject)*/null
+        toOnAdBreakStart(mediaHeartbeat, player, toCreateAdBreakObject)
       ),
       toEventDataObj(
         PlayerEvent.AdStarted,
-        toOnAdStart(mediaHeartbeat, p, toCreateAdObject)
+        toOnAdStart(mediaHeartbeat, player, toCreateAdObject)
       ),
       toEventDataObj(PlayerEvent.AdFinished, toOnAdComplete(mediaHeartbeat)),
       toEventDataObj(PlayerEvent.AdSkipped, toOnAdSkip(mediaHeartbeat)),
       toEventDataObj(
         PlayerEvent.AdBreakFinished,
-        toOnAdBreakComplete(mediaHeartbeat, p, finished)
+        toOnAdBreakComplete(mediaHeartbeat, player, finished)
       ),
       // Chapter and segment related events
       toEventDataObj(
         PlayerEvent.TimeChanged,
-        /*checkChapter(mediaHeartbeat, p, toCreateChapterObject)*/null
+        checkChapter(mediaHeartbeat, player, toCreateChapterObject)
       ),
       // Quality of service (QoS) related events
       toEventDataObj(
