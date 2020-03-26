@@ -164,7 +164,7 @@ export const toOnSeekEnd = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeart
 // Ads
 export const toOnAdBreakStart = (mediaHeartbeat : MediaHeartbeat, player : PlayerAPI, toCreateAdBreakObject : PlayerWithItemProjection <AdBreakObject, AdBreakEvent>) => (evt : AdBreakEvent) => mediaHeartbeat.trackEvent(Event.AdBreakStart, toCreateAdBreakObject(player, evt));
 
-export const toOnAdStart = (mediaHeartbeat : MediaHeartbeat, player : PlayerAPI, toCreateAdObject : PlayerWithItemProjection <AdObject, AdBreakEvent>) => (evt : AdBreakEvent) => mediaHeartbeat.trackEvent(Event.AdStart, toCreateAdObject(player, evt));
+export const toOnAdStart = (mediaHeartbeat : MediaHeartbeat, player : PlayerAPI, toCreateAdObject : PlayerWithItemProjection <AdObject, AdEvent>) => (evt : AdEvent) => mediaHeartbeat.trackEvent(Event.AdStart, toCreateAdObject(player, evt));
 
 export const toOnAdComplete = (mediaHeartbeat : MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.AdComplete);
 
