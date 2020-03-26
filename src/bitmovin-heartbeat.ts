@@ -185,7 +185,7 @@ export const HeartbeatAnalytics = function(
     mediaDelegate: MediaHeartbeatDelegate,
     toCreateMediaObject: PlayerWithItemProjection<MediaObject, {}>,
     toCreateAdBreakObject: PlayerWithItemProjection<AdBreakObject, AdBreakEvent>,
-    toCreateAdObject: PlayerWithItemProjection<AdObject, AdBreakEvent>,
+    toCreateAdObject: PlayerWithItemProjection<AdObject, AdEvent>,
     toCreateChapterObject: PlayerWithItemProjection<ChapterObject, ChapterEvent>,
     player: PlayerAPI
   ) => () => {

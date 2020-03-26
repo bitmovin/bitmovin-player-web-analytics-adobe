@@ -47,13 +47,12 @@ export const toVideoStreamType = (player: PlayerAPI) =>
 export const toAdBreakStartTime = (player: PlayerAPI) =>
   player.getCurrentTime();
 
-  export const toAdPosition = (
+export const toAdPosition = (
     player: PlayerAPI,
-    adStartedEvent: AdBreakEvent
-  ) =>  adStartedEvent.adBreak.scheduleTime.toString();
+    adStartedEvent: AdEvent
+  ) =>  "1"
 
-export const toAdLength = (player: PlayerAPI, adStartedEvent: AdBreakEvent) =>
-adStartedEvent.adBreak.replaceContentDuration.toString();
+export const toAdLength = (player: PlayerAPI, adStartedEvent: AdEvent) => "5";
 
 export const toChapterNameDefault = (player: PlayerAPI, e: ChapterEvent) =>
   e.title;
