@@ -41,10 +41,9 @@ const removeAtIndex = (arr: any[], i: number): any[] => [
 ];
 
 export const hasPostAd = (player: PlayerAPI): Boolean => {
-  const advertising = player.ads;
-  const schedule = (advertising && advertising.schedule) || {};
-  const offsets = Object.keys(schedule).map(ad => schedule[ad].offset);
-  return !!offsets.filter(x => x === 'post').length;
+  var adBreaks = player.getConfig().advertising.adBreaks;
+  const positions = Object.keys(adBreaks).map(ad => adBreaks[ad].position);
+  return !!positions.filter(x => x === 'post').length;
 };
 
 export const toGetStreamType = (player: PlayerAPI): string =>
