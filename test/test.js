@@ -2,7 +2,7 @@ var TRACKING_SERVER = 'ADOBE d3 TRACKING SERVER'; //'<organization-name>.d3.sc.o
 
 // Bitmovin player config object
 var playerConfig = {
-  key: '109b907a-d107-4db0-9bce-150c397da837',
+  key: 'YOUR PLAYER KEY HERE',
   advertising: {
     adBreaks: [
       {

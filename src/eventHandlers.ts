@@ -166,7 +166,8 @@ export const checkChapter = (
   toCreateChapterObject: PlayerWithItemProjection<ChapterObject, ChapterEvent>
 ) => {
   let currentChapter;
-  const markers = p.getConfig().ui.metadata.markers || [];
+  const playerSourceConfig = p.getSource() || {};
+  const markers = (playerSourceConfig as any).markers || p.getConfig().ui.metadata.markers || [];
   const markersWithInterval: ChapterEvent[] = markers.map((m, position, a) =>
     Object.assign({}, m, {
       position,
