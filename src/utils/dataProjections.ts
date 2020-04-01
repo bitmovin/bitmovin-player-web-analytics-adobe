@@ -50,9 +50,9 @@ export const toAdBreakStartTime = (
   adBreakEvent: AdBreakEvent
 ) => adBreakEvent.adBreak.scheduleTime;
 
-export const toAdPosition = (player: PlayerAPI, adStartedEvent: AdEvent) => '1';
+export const toAdPosition = (player: PlayerAPI, adStartedEvent: AdEvent) => 1;
 
-export const toAdLength = (player: PlayerAPI, adStartedEvent: AdEvent) => '5';
+export const toAdLength = (player: PlayerAPI, adStartedEvent: AdEvent) => 5;
 
 export const toChapterNameDefault = (player: PlayerAPI, e: ChapterEvent) =>
   e.title;
