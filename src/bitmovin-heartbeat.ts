@@ -45,7 +45,7 @@ import { PlayerAPI, PlayerEvent, AdBreakEvent, AdEvent } from 'bitmovin-player';
 
 import { ChapterEvent } from './types/analytics';
 
-import { MediaHeartbeatStub } from './dev/adobeStub';
+import { MediaHeartbeatPass } from './dev/adobePassthrough';
 
 import {
   noop,
@@ -147,7 +147,7 @@ export const HeartbeatAnalytics = function(
   /**
    * Create MediaHeartbeat instance
    */
-  const mediaHeartbeat = new MediaHeartbeatStub(
+  const mediaHeartbeat = new MediaHeartbeatPass(
     mediaDelegate,
     mediaConfigObj,
     appMeasurement
