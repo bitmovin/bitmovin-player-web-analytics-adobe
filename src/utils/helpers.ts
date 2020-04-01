@@ -19,7 +19,6 @@ import {
   PlayerEvent
 } from 'bitmovin-player';
 
-
 export const noop = () => {};
 
 // RegEx solution found here: https://stackoverflow.com/questions/7944460/detect-safari-browser

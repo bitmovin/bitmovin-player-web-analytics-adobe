@@ -1,5 +1,4 @@
-
-import { PlayerAPI, AdBreakEvent, AdEvent} from 'bitmovin-player';
+import { PlayerAPI, AdBreakEvent, AdEvent } from 'bitmovin-player';
 
 import { ChapterEvent } from '../types/analytics';
 
@@ -36,23 +35,24 @@ export const toDroppedFrames = (player: PlayerAPI) => {
   return player.getDroppedVideoFrames();
 };
 
-export const toVideoTitle = (player: PlayerAPI) =>
-  player.getSource().title;
+export const toVideoTitle = (player: PlayerAPI) => player.getSource().title;
 
 export const toVideoDuration = (player: PlayerAPI) => player.getDuration();
 
 export const toVideoStreamType = (player: PlayerAPI) =>
   player.isLive() ? HeartbeatStreamType.LIVE : HeartbeatStreamType.VOD;
 
-export const toAdBreakStartTime = (player: PlayerAPI) =>
-  player.getCurrentTime();
+export const toAdBreakName = (player: PlayerAPI, adBreakEvent: AdBreakEvent) =>
+  adBreakEvent.adBreak.id;
 
-export const toAdPosition = (
-    player: PlayerAPI,
-    adStartedEvent: AdEvent
-  ) =>  "1"
+export const toAdBreakStartTime = (
+  player: PlayerAPI,
+  adBreakEvent: AdBreakEvent
+) => adBreakEvent.adBreak.scheduleTime;
 
-export const toAdLength = (player: PlayerAPI, adStartedEvent: AdEvent) => "5";
+export const toAdPosition = (player: PlayerAPI, adStartedEvent: AdEvent) => '1';
+
+export const toAdLength = (player: PlayerAPI, adStartedEvent: AdEvent) => '5';
 
 export const toChapterNameDefault = (player: PlayerAPI, e: ChapterEvent) =>
   e.title;

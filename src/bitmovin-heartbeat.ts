@@ -56,7 +56,6 @@ import {
 } from './utils/helpers';
 
 import {
-  toAdBreakNameDefault,
   toChapterNameDefault,
   toChapterPositionDefault,
   toChapterLengthDefault,
@@ -64,6 +63,7 @@ import {
   toVideoTitle,
   toVideoDuration,
   toVideoStreamType,
+  toAdBreakName,
   toAdBreakStartTime,
   toAdPosition,
   toAdLength,
@@ -85,13 +85,11 @@ export const HeartbeatAnalytics = function(
     toAdName = (player: PlayerAPI) => '',
     toAdId = (player: PlayerAPI) => '',
     toAdBreakPosition = (player: PlayerAPI) => null,
-    toAdBreakName = toAdBreakNameDefault,
     toChapterName = toChapterNameDefault,
     toChapterPosition = toChapterPositionDefault,
     toChapterLength = toChapterLengthDefault,
     toChapterStartTime = toChapterStartTimeDefault
-  } =
-    heartbeatDataProjections || {};
+  } = heartbeatDataProjections || {};
 
   /**
    * Create functions to build various Heartbeat objects.
@@ -184,9 +182,15 @@ export const HeartbeatAnalytics = function(
     mediaHeartbeat: MediaHeartbeat,
     mediaDelegate: MediaHeartbeatDelegate,
     toCreateMediaObject: PlayerWithItemProjection<MediaObject, {}>,
-    toCreateAdBreakObject: PlayerWithItemProjection<AdBreakObject, AdBreakEvent>,
+    toCreateAdBreakObject: PlayerWithItemProjection<
+      AdBreakObject,
+      AdBreakEvent
+    >,
     toCreateAdObject: PlayerWithItemProjection<AdObject, AdEvent>,
-    toCreateChapterObject: PlayerWithItemProjection<ChapterObject, ChapterEvent>,
+    toCreateChapterObject: PlayerWithItemProjection<
+      ChapterObject,
+      ChapterEvent
+    >,
     player: PlayerAPI
   ) => () => {
     const mediaObject = toCreateMediaObject(player);
@@ -235,7 +239,10 @@ export const HeartbeatAnalytics = function(
       toEventDataObj(PlayerEvent.Error, toOnError(mediaHeartbeat)),
       toEventDataObj(PlayerEvent.AdError, toOnAdError(mediaHeartbeat)),
       // Session End
-      toEventDataObj(PlayerEvent.SourceUnloaded, toOnVideoDestroy(mediaHeartbeat))
+      toEventDataObj(
+        PlayerEvent.SourceUnloaded,
+        toOnVideoDestroy(mediaHeartbeat)
+      )
     ]);
     allTeardowns = [...allTeardowns, ...teardowns];
   };
@@ -260,7 +267,7 @@ export const HeartbeatAnalytics = function(
     ...allTeardowns,
     ...toTeardownTuples([
       toEventDataObj(
-        PlayerEvent.Ready,
+        PlayerEvent.SourceLoaded,
         toOnVideoLoad(
           mediaHeartbeat,
           mediaDelegate,
@@ -271,7 +278,7 @@ export const HeartbeatAnalytics = function(
           player
         )
       ),
-      toEventDataObj(PlayerEvent.Destroy, toOnVideoDestroy(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.Destroy, toOnVideoDestroy(mediaHeartbeat))
     ]),
     bitrateState,
     startupDeltaState,
