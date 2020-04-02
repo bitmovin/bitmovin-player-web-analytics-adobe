@@ -73,8 +73,7 @@ The Heartbeat Analytics Function also takes a Data Projection Object which is co
 | ----------------- |:-------------:|:-----------:|-----------:|
 | toAdName          | (player:PlayerAPI, adEvent:AdEvent) => string | YES | Returns the Name of the current Ad|
 | toAdId            | (player:PlayerAPI, adEvent:AdEvent) => string | YES | Returns the ID for the current Ad|
-| toAdBreakName     | (player:PlayerAPI, adEvent:AdEvent) => string | 	NO |Returns a name for the current AdBreak|
-| toAdBreakPosition | (player:PlayerAPI, adEvent:AdEvent) => number | YES |Returns the number of the current AdBreak|
+| toAdBreakPosition | (player:PlayerAPI, adBreakEvent:AdBreakEvent) => number | YES |Returns the number of the current AdBreak|
 
 ##### Chapters
 
@@ -147,4 +146,4 @@ yarn run format
 
 ### adobeStub
 
-To help with development, an additional file, `adobeStub.ts`, is included in this repository. This file can replace the Adobe Heartbeat library in `bitmovin-heartbeat.ts`. This will allow you to view event calls to Heartbeat without the need of a Adobe Heartbeat Account.
+To help with development, an additional file, `adobeStub.ts`, is included in this repository. This file can replace the Adobe Heartbeat library (`adobePassthrough.ts`) in `bitmovin-heartbeat.ts`. This will allow you to view event calls to Heartbeat without the need of a Adobe Heartbeat Account.
