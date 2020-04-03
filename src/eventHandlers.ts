@@ -70,7 +70,6 @@ export const toStartUpTime = (
   let deltaT;
   let teardowns = [];
   const playCallback = (loadedTime: number) => () =>
-    console.log('playCallback: ', Date.now(), loadedTime) ||
     (deltaT = Date.now() - loadedTime);
 
   const doThenTeardown = (
