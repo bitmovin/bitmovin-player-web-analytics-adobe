@@ -156,20 +156,29 @@ export const HeartbeatAnalytics = function(
   const finished = () => {
     mediaHeartbeat.trackComplete();
     const currentPlay = allTeardowns.find(
-      ([, { eventType = '' } = {}]) => eventType === player.exports.PlayerEvent.Playing
+      ([, { eventType = '' } = {}]) =>
+        eventType === player.exports.PlayerEvent.Playing
     );
     const [oldPlayTeardown, { callback: oldPlayCallback }] = currentPlay;
-    const teardown = addPlayerEventHandler(player, player.exports.PlayerEvent.Play, () => {
-      mediaHeartbeat.trackSessionEnd();
-      oldPlayTeardown();
-      mediaHeartbeat.trackSessionStart(toCreateMediaObject(player), {});
-      teardown();
-      oldPlayCallback();
-      allTeardowns = [
-        ...allTeardowns,
-        addPlayerEventHandler(player, player.exports.PlayerEvent.Playing, oldPlayCallback)
-      ];
-    });
+    const teardown = addPlayerEventHandler(
+      player,
+      player.exports.PlayerEvent.Play,
+      () => {
+        mediaHeartbeat.trackSessionEnd();
+        oldPlayTeardown();
+        mediaHeartbeat.trackSessionStart(toCreateMediaObject(player), {});
+        teardown();
+        oldPlayCallback();
+        allTeardowns = [
+          ...allTeardowns,
+          addPlayerEventHandler(
+            player,
+            player.exports.PlayerEvent.Playing,
+            oldPlayCallback
+          )
+        ];
+      }
+    );
   };
 
   /**
@@ -198,18 +207,36 @@ export const HeartbeatAnalytics = function(
     mediaHeartbeat.trackSessionStart(mediaObject, {});
     const teardowns = toTeardownTuples([
       // Core Playback
-      toEventDataObj(player.exports.PlayerEvent.Playing, onVideoPlay(mediaHeartbeat)),
+      toEventDataObj(
+        player.exports.PlayerEvent.Playing,
+        onVideoPlay(mediaHeartbeat)
+      ),
       toEventDataObj(
         player.exports.PlayerEvent.PlaybackFinished,
         toOnVideoComplete(mediaHeartbeat, player, toCreateMediaObject, finished)
       ),
-      toEventDataObj(player.exports.PlayerEvent.Paused, onVideoPause(mediaHeartbeat)),
+      toEventDataObj(
+        player.exports.PlayerEvent.Paused,
+        onVideoPause(mediaHeartbeat)
+      ),
       // Buffering
-      toEventDataObj(player.exports.PlayerEvent.StallStarted, toOnBufferStart(mediaHeartbeat)),
-      toEventDataObj(player.exports.PlayerEvent.StallEnded, toOnBufferEnd(mediaHeartbeat)),
+      toEventDataObj(
+        player.exports.PlayerEvent.StallStarted,
+        toOnBufferStart(mediaHeartbeat)
+      ),
+      toEventDataObj(
+        player.exports.PlayerEvent.StallEnded,
+        toOnBufferEnd(mediaHeartbeat)
+      ),
       // Seeking
-      toEventDataObj(player.exports.PlayerEvent.Seek, toOnSeekStart(mediaHeartbeat)),
-      toEventDataObj(player.exports.PlayerEvent.Seeked, toOnSeekEnd(mediaHeartbeat)),
+      toEventDataObj(
+        player.exports.PlayerEvent.Seek,
+        toOnSeekStart(mediaHeartbeat)
+      ),
+      toEventDataObj(
+        player.exports.PlayerEvent.Seeked,
+        toOnSeekEnd(mediaHeartbeat)
+      ),
       // Ad related events
       toEventDataObj(
         player.exports.PlayerEvent.AdBreakStarted,
@@ -219,8 +246,14 @@ export const HeartbeatAnalytics = function(
         player.exports.PlayerEvent.AdStarted,
         toOnAdStart(mediaHeartbeat, player, toCreateAdObject)
       ),
-      toEventDataObj(player.exports.PlayerEvent.AdFinished, toOnAdComplete(mediaHeartbeat)),
-      toEventDataObj(player.exports.PlayerEvent.AdSkipped, toOnAdSkip(mediaHeartbeat)),
+      toEventDataObj(
+        player.exports.PlayerEvent.AdFinished,
+        toOnAdComplete(mediaHeartbeat)
+      ),
+      toEventDataObj(
+        player.exports.PlayerEvent.AdSkipped,
+        toOnAdSkip(mediaHeartbeat)
+      ),
       toEventDataObj(
         player.exports.PlayerEvent.AdBreakFinished,
         toOnAdBreakComplete(mediaHeartbeat, player, finished)
@@ -236,8 +269,14 @@ export const HeartbeatAnalytics = function(
         toOnVideoQualityChanged(mediaHeartbeat, mediaDelegate)
       ),
       // Errors
-      toEventDataObj(player.exports.PlayerEvent.Error, toOnError(mediaHeartbeat)),
-      toEventDataObj(player.exports.PlayerEvent.AdError, toOnAdError(mediaHeartbeat)),
+      toEventDataObj(
+        player.exports.PlayerEvent.Error,
+        toOnError(mediaHeartbeat)
+      ),
+      toEventDataObj(
+        player.exports.PlayerEvent.AdError,
+        toOnAdError(mediaHeartbeat)
+      ),
       // Session End
       toEventDataObj(
         player.exports.PlayerEvent.SourceUnloaded,
@@ -278,7 +317,10 @@ export const HeartbeatAnalytics = function(
           player
         )
       ),
-      toEventDataObj(player.exports.PlayerEvent.Destroy, toOnVideoDestroy(mediaHeartbeat))
+      toEventDataObj(
+        player.exports.PlayerEvent.Destroy,
+        toOnVideoDestroy(mediaHeartbeat)
+      )
     ]),
     bitrateState,
     startupDeltaState,
