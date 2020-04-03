@@ -173,7 +173,7 @@ export const checkChapter = (
     p.getConfig().ui.metadata.markers
       ? p.getConfig().ui.metadata.markers
       : [];
-  const markers = playerSourceConfigMarkers && playerUIConfigMarkers;
+  const markers = playerSourceConfigMarkers.concat(playerUIConfigMarkers);
   const markersWithInterval: ChapterEvent[] = markers.map((m, position, a) =>
     Object.assign({}, m, {
       position,
