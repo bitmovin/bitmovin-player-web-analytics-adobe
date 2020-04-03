@@ -1,0 +1,22 @@
+{
+  "name": "bitmovinplayer-adobeheartbeat",
+  "description": "Adobe Heartbeat Analytics integration for the Bitmovin Player",
+  "version": "1.0.0-beta.0",
+  "homepage": "https://bitmovin.com",
+  "keywords": [
+    "adobe analytics",
+    "adobe vhl",
+    "adobe heartbeat",
+    "bitmovin player",
+    "video player"
+  ],
+  "author": {
+    "name": "Bitmovin"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "main": "./bitmovinplayer-adobeheartbeat.js",
+  "private": false
+}
