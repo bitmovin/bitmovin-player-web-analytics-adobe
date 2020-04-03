@@ -11,7 +11,6 @@ var playerConfig = {
             'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F32573358%2Fskippable_ad_unit&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&eid=495644008&sdkv=h.3.198.2&sdki=3c0d&correlator=1919695060472234&scor=2016491895316387&adk=3454041677&media_url=blob%3Ahttp%253a%2F%2Flocalhost%253a8080%2F292b4e26-2725-457e-8a69-e5f90e472b28&u_so=l&osd=2&frm=0&sdr=1&is_amp=0&adsid=NT&jar=2018-3-29-13&mpt=bitmovin-player&afvsz=450x50%2C468x60%2C480x70&url=null&ged=ve4_td3_tt0_pd3_la3000_er0.0.0.0_vi0.0.862.539_vp0_eb16491',
           type: 'vast'
         },
-        persistent: true,
         id: 'pre-roll-1',
         position: 'pre'
       },
@@ -21,7 +20,6 @@ var playerConfig = {
             'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=',
           type: 'vast'
         },
-        persistent: true,
         id: 'post-roll-1',
         position: 'post'
       }
@@ -30,10 +28,10 @@ var playerConfig = {
   ui: {
     metadata: {
       markers: [
-        { time: 24, title: 'Salto on the edge' },
-        { time: 69, title: 'Interview - Marcus Gustafsson' },
-        { time: 105, title: 'Parcour rating explained' },
-        { time: 188, duration: 11, title: 'And we have a winner!' }
+        { time: 24, title: 'First Chapter' },
+        { time: 69, title: 'Chapter 2' },
+        { time: 105, title: 'Chapter 3' },
+        { time: 188, duration: 11, title: 'Last Chapter' }
       ]
     }
   }
@@ -52,15 +50,28 @@ var sourceConfig = {
 
 var toDataProjectionOverrides = function(player) {
   var ID_LOCATION = 4;
+  var startedAdBreaksMap = new Map();
 
-  var toAdBreakSlots = function() {
+  function updateStartedAdBreaksMap(adBreakEvent) {
+    startedAdBreaksMap.set(JSON.stringify(adBreakEvent), adBreakEvent);
+    return Array.from(startedAdBreaksMap.values());
+  }
+
+  function sortedAdBreakSlots(adBreakEvent) {
     var adBreaks = player.getConfig().advertising.adBreaks;
-    return Object.keys(adBreaks)
+    var previousAdBreaks = updateStartedAdBreaksMap(adBreakEvent);
+    var scheduledAdBreaks = player.ads.list();
+    var mergedAdBreakSlots = previousAdBreaks.concat(scheduledAdBreaks);
+
+    return Object.keys(mergedAdBreakSlots)
       .map(function(key) {
-        return [adBreaks[key].id, normalizeAdTime(adBreaks[key].position)];
+        return [
+          JSON.stringify(mergedAdBreakSlots[key]),
+          normalizeAdTime(mergedAdBreakSlots[key].position)
+        ];
       })
       .sort(compareAdBreaks);
-  };
+  }
 
   function compareAdBreaks(a, b) {
     return a[1] - b[1];
@@ -104,10 +115,10 @@ var toDataProjectionOverrides = function(player) {
     //TODO: We are using AdBreakName as a source of truth to signify adBreak Change.
     //      Might hit race problems or other problems if the two functions desync
     toAdBreakPosition: function(player, adBreakEvent) {
-      var adBreaksSlots = toAdBreakSlots();
+      var adBreaksSlots = sortedAdBreakSlots(adBreakEvent.adBreak);
 
       var adBreakIndex = adBreaksSlots.findIndex(function(slot) {
-        return slot[0] === adBreakEvent.adBreak.id;
+        return slot[0] === JSON.stringify(adBreakEvent.adBreak);
       });
 
       // The positions of the ad breaks in the content start with 1

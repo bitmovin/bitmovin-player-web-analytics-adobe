@@ -41,9 +41,17 @@ const removeAtIndex = (arr: any[], i: number): any[] => [
 ];
 
 export const hasPostAd = (player: PlayerAPI): Boolean => {
-  var adBreaks = player.getConfig().advertising.adBreaks;
-  const positions = Object.keys(adBreaks).map(ad => adBreaks[ad].position);
-  return !!positions.filter(x => x === 'post').length;
+  const scheduledAdBreakList = player.ads.list();
+  var ret = false;
+  if (scheduledAdBreakList.length > 0) {
+    const positions = Object.keys(scheduledAdBreakList).map(
+      x => scheduledAdBreakList[x].position
+    );
+    ret = !!positions.filter(x => x === 'post').length;
+  } else {
+    ret = false;
+  }
+  return ret;
 };
 
 export const toGetStreamType = (player: PlayerAPI): string =>
