@@ -86,14 +86,14 @@ export const toStartUpTime = (
   const sourceLoadedCallback = (): void => {
     teardowns[1] = addPlayerEventHandler(
       player,
-      PlayerEvent.Play,
+      player.exports.PlayerEvent.Play,
       doThenTeardown(playCallback(Date.now()), teardowns, 1)
     );
   };
 
   teardowns[0] = addPlayerEventHandler(
     player,
-    PlayerEvent.SourceLoaded,
+    player.exports.PlayerEvent.SourceLoaded,
     sourceLoadedCallback
   );
 
@@ -122,7 +122,7 @@ export const toGetBitrate = (
   ) => (bitrate = evt.targetQuality.bitrate);
   const removeVideoPlaybackQualityChangedCallback = addPlayerEventHandler(
     player,
-    PlayerEvent.VideoPlaybackQualityChanged,
+    player.exports.PlayerEvent.VideoPlaybackQualityChanged,
     videoPlaybackQualityChangedCallback
   );
   return [removeVideoPlaybackQualityChangedCallback, () => bitrate];
