@@ -25,16 +25,15 @@ import {
 
 import { toAdBreakNameDefault } from './utils/dataProjections';
 
-import bitmovin, {
+import {
   PlayerAPI,
   PlaybackEvent,
+  PlayerEvent,
   PlayerEventCallback,
   VideoPlaybackQualityChangedEvent,
-  PlayerEvent,
-  AdStartedEvent
-} from './types/bitmovin';
-
-const EVENT = bitmovin.player.EVENT;
+  AdBreakEvent,
+  AdEvent
+} from 'bitmovin-player';
 
 /**
  * creates a Teardown function
@@ -42,9 +41,9 @@ const EVENT = bitmovin.player.EVENT;
  */
 const toRemovePlayerEventHandler = (
   player: PlayerAPI,
-  eventType: string,
+  eventType: PlayerEvent,
   callback: PlayerEventCallback
-): Teardown => () => player.removeEventHandler(eventType, callback);
+): Teardown => () => player.off(eventType, callback);
 
 /**
  * Adds a Event handler to the player and returns the teardown function
@@ -52,10 +51,10 @@ const toRemovePlayerEventHandler = (
  */
 export const addPlayerEventHandler = (
   player: PlayerAPI,
-  eventType: string,
+  eventType: PlayerEvent,
   callback: PlayerEventCallback
 ): Teardown => {
-  player.addEventHandler(eventType, callback);
+  player.on(eventType, callback);
   return toRemovePlayerEventHandler(player, eventType, callback);
 };
 
@@ -83,18 +82,18 @@ export const toStartUpTime = (
     teardowns = teardownAndRemove(teardownArr, index);
   };
 
-  //this unfortunately needs to be done this way since we cant get anything out of play callback
+  // this unfortunately needs to be done this way since we cant get anything out of play callback
   const sourceLoadedCallback = (): void => {
     teardowns[1] = addPlayerEventHandler(
       player,
-      EVENT.ON_PLAY,
+      PlayerEvent.Play,
       doThenTeardown(playCallback(Date.now()), teardowns, 1)
     );
   };
-  // TODO: Consider ON_READY instead of ON_SOURCE_LOADED
+
   teardowns[0] = addPlayerEventHandler(
     player,
-    EVENT.ON_SOURCE_LOADED,
+    PlayerEvent.SourceLoaded,
     sourceLoadedCallback
   );
 
@@ -123,7 +122,7 @@ export const toGetBitrate = (
   ) => (bitrate = evt.targetQuality.bitrate);
   const removeVideoPlaybackQualityChangedCallback = addPlayerEventHandler(
     player,
-    EVENT.ON_VIDEO_PLAYBACK_QUALITY_CHANGED,
+    PlayerEvent.VideoPlaybackQualityChanged,
     videoPlaybackQualityChangedCallback
   );
   return [removeVideoPlaybackQualityChangedCallback, () => bitrate];
@@ -167,7 +166,14 @@ export const checkChapter = (
   toCreateChapterObject: PlayerWithItemProjection<ChapterObject, ChapterEvent>
 ) => {
   let currentChapter;
-  const markers = p.getConfig().source.markers || [];
+  const playerSourceConfigMarkers = (p.getSource() as any).markers || [];
+  const playerUIConfigMarkers =
+    p.getConfig().ui &&
+    p.getConfig().ui.metadata &&
+    p.getConfig().ui.metadata.markers
+      ? p.getConfig().ui.metadata.markers
+      : [];
+  const markers = playerSourceConfigMarkers.concat(playerUIConfigMarkers);
   const markersWithInterval: ChapterEvent[] = markers.map((m, position, a) =>
     Object.assign({}, m, {
       position,
@@ -198,29 +204,34 @@ export const checkChapter = (
 // Buffering
 export const toOnBufferStart = (mediaHeartbeat: MediaHeartbeat) => () =>
   mediaHeartbeat.trackEvent(Event.BufferStart);
+
 export const toOnBufferEnd = (mediaHeartbeat: MediaHeartbeat) => () =>
   mediaHeartbeat.trackEvent(Event.BufferComplete);
 
 // Seeking
 export const toOnSeekStart = (mediaHeartbeat: MediaHeartbeat) => () =>
   mediaHeartbeat.trackEvent(Event.SeekStart);
+
 export const toOnSeekEnd = (mediaHeartbeat: MediaHeartbeat) => () =>
   mediaHeartbeat.trackEvent(Event.SeekComplete);
 
 // Ads
 export const toOnAdBreakStart = (
   mediaHeartbeat: MediaHeartbeat,
-  p: PlayerAPI,
-  toCreateAdBreakObject: PlayerWithItemProjection<AdBreakObject, PlayerEvent>
-) => (evt: PlayerEvent) =>
-  mediaHeartbeat.trackEvent(Event.AdBreakStart, toCreateAdBreakObject(p, evt));
+  player: PlayerAPI,
+  toCreateAdBreakObject: PlayerWithItemProjection<AdBreakObject, AdBreakEvent>
+) => (evt: AdBreakEvent) =>
+  mediaHeartbeat.trackEvent(
+    Event.AdBreakStart,
+    toCreateAdBreakObject(player, evt)
+  );
 
 export const toOnAdStart = (
   mediaHeartbeat: MediaHeartbeat,
-  p: PlayerAPI,
-  toCreateAdObject: PlayerWithItemProjection<AdObject, AdStartedEvent>
-) => (evt: AdStartedEvent) =>
-  mediaHeartbeat.trackEvent(Event.AdStart, toCreateAdObject(p, evt));
+  player: PlayerAPI,
+  toCreateAdObject: PlayerWithItemProjection<AdObject, AdEvent>
+) => (evt: AdEvent) =>
+  mediaHeartbeat.trackEvent(Event.AdStart, toCreateAdObject(player, evt));
 
 export const toOnAdComplete = (mediaHeartbeat: MediaHeartbeat) => () =>
   mediaHeartbeat.trackEvent(Event.AdComplete);

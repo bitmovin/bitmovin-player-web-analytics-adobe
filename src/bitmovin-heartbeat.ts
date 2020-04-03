@@ -41,7 +41,7 @@ import {
 
 import HeartbeatDataProjections from './types/HeartbeatDataProjections';
 
-import { PlayerAPI, PlayerEvent, AdStartedEvent } from './types/bitmovin';
+import { PlayerAPI, PlayerEvent, AdBreakEvent, AdEvent } from 'bitmovin-player';
 
 import { ChapterEvent } from './types/analytics';
 
@@ -56,7 +56,6 @@ import {
 } from './utils/helpers';
 
 import {
-  toAdBreakNameDefault,
   toChapterNameDefault,
   toChapterPositionDefault,
   toChapterLengthDefault,
@@ -64,13 +63,12 @@ import {
   toVideoTitle,
   toVideoDuration,
   toVideoStreamType,
+  toAdBreakName,
   toAdBreakStartTime,
   toAdPosition,
   toAdLength,
   toDroppedFrames
 } from './utils/dataProjections';
-
-const EVENT = bitmovin.player.EVENT;
 
 /**
  * @return tearDown is a function that will remove all event handlers associated with heartbeat
@@ -87,13 +85,11 @@ export const HeartbeatAnalytics = function(
     toAdName = (player: PlayerAPI) => '',
     toAdId = (player: PlayerAPI) => '',
     toAdBreakPosition = (player: PlayerAPI) => null,
-    toAdBreakName = toAdBreakNameDefault,
     toChapterName = toChapterNameDefault,
     toChapterPosition = toChapterPositionDefault,
     toChapterLength = toChapterLengthDefault,
     toChapterStartTime = toChapterStartTimeDefault
-  } =
-    heartbeatDataProjections || {};
+  } = heartbeatDataProjections || {};
 
   /**
    * Create functions to build various Heartbeat objects.
@@ -160,10 +156,10 @@ export const HeartbeatAnalytics = function(
   const finished = () => {
     mediaHeartbeat.trackComplete();
     const currentPlay = allTeardowns.find(
-      ([, { eventType = '' } = {}]) => eventType === EVENT.ON_PLAYING
+      ([, { eventType = '' } = {}]) => eventType === PlayerEvent.Playing
     );
     const [oldPlayTeardown, { callback: oldPlayCallback }] = currentPlay;
-    const teardown = addPlayerEventHandler(player, EVENT.ON_PLAY, () => {
+    const teardown = addPlayerEventHandler(player, PlayerEvent.Play, () => {
       mediaHeartbeat.trackSessionEnd();
       oldPlayTeardown();
       mediaHeartbeat.trackSessionStart(toCreateMediaObject(player), {});
@@ -171,7 +167,7 @@ export const HeartbeatAnalytics = function(
       oldPlayCallback();
       allTeardowns = [
         ...allTeardowns,
-        addPlayerEventHandler(player, EVENT.ON_PLAYING, oldPlayCallback)
+        addPlayerEventHandler(player, PlayerEvent.Playing, oldPlayCallback)
       ];
     });
   };
@@ -186,61 +182,67 @@ export const HeartbeatAnalytics = function(
     mediaHeartbeat: MediaHeartbeat,
     mediaDelegate: MediaHeartbeatDelegate,
     toCreateMediaObject: PlayerWithItemProjection<MediaObject, {}>,
-    toCreateAdBreakObject: PlayerWithItemProjection<AdBreakObject, PlayerEvent>,
-    toCreateAdObject: PlayerWithItemProjection<AdObject, AdStartedEvent>,
+    toCreateAdBreakObject: PlayerWithItemProjection<
+      AdBreakObject,
+      AdBreakEvent
+    >,
+    toCreateAdObject: PlayerWithItemProjection<AdObject, AdEvent>,
     toCreateChapterObject: PlayerWithItemProjection<
       ChapterObject,
       ChapterEvent
     >,
-    p: PlayerAPI
+    player: PlayerAPI
   ) => () => {
-    const mediaObject = toCreateMediaObject(p);
+    const mediaObject = toCreateMediaObject(player);
     // TODO: player.getManifest()
     mediaHeartbeat.trackSessionStart(mediaObject, {});
     const teardowns = toTeardownTuples([
       // Core Playback
-      toEventDataObj(EVENT.ON_PLAYING, onVideoPlay(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.Playing, onVideoPlay(mediaHeartbeat)),
       toEventDataObj(
-        EVENT.ON_PLAYBACK_FINISHED,
-        toOnVideoComplete(mediaHeartbeat, p, toCreateMediaObject, finished)
+        PlayerEvent.PlaybackFinished,
+        toOnVideoComplete(mediaHeartbeat, player, toCreateMediaObject, finished)
       ),
-      toEventDataObj(EVENT.ON_PAUSED, onVideoPause(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.Paused, onVideoPause(mediaHeartbeat)),
       // Buffering
-      toEventDataObj(EVENT.ON_STALL_STARTED, toOnBufferStart(mediaHeartbeat)),
-      toEventDataObj(EVENT.ON_STALL_ENDED, toOnBufferEnd(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.StallStarted, toOnBufferStart(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.StallEnded, toOnBufferEnd(mediaHeartbeat)),
       // Seeking
-      toEventDataObj(EVENT.ON_SEEK, toOnSeekStart(mediaHeartbeat)),
-      toEventDataObj(EVENT.ON_SEEKED, toOnSeekEnd(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.Seek, toOnSeekStart(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.Seeked, toOnSeekEnd(mediaHeartbeat)),
       // Ad related events
       toEventDataObj(
-        EVENT.ON_AD_BREAK_STARTED,
-        toOnAdBreakStart(mediaHeartbeat, p, toCreateAdBreakObject)
+        PlayerEvent.AdBreakStarted,
+        toOnAdBreakStart(mediaHeartbeat, player, toCreateAdBreakObject)
       ),
       toEventDataObj(
-        EVENT.ON_AD_STARTED,
-        toOnAdStart(mediaHeartbeat, p, toCreateAdObject)
+        PlayerEvent.AdStarted,
+        toOnAdStart(mediaHeartbeat, player, toCreateAdObject)
       ),
-      toEventDataObj(EVENT.ON_AD_FINISHED, toOnAdComplete(mediaHeartbeat)),
-      toEventDataObj(EVENT.ON_AD_SKIPPED, toOnAdSkip(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.AdFinished, toOnAdComplete(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.AdSkipped, toOnAdSkip(mediaHeartbeat)),
       toEventDataObj(
-        EVENT.ON_AD_BREAK_FINISHED,
-        toOnAdBreakComplete(mediaHeartbeat, p, finished)
+        PlayerEvent.AdBreakFinished,
+        toOnAdBreakComplete(mediaHeartbeat, player, finished)
       ),
       // Chapter and segment related events
       toEventDataObj(
-        EVENT.ON_TIME_CHANGED,
-        checkChapter(mediaHeartbeat, p, toCreateChapterObject)
+        PlayerEvent.TimeChanged,
+        checkChapter(mediaHeartbeat, player, toCreateChapterObject)
       ),
       // Quality of service (QoS) related events
       toEventDataObj(
-        EVENT.ON_VIDEO_PLAYBACK_QUALITY_CHANGED,
+        PlayerEvent.VideoPlaybackQualityChanged,
         toOnVideoQualityChanged(mediaHeartbeat, mediaDelegate)
       ),
       // Errors
-      toEventDataObj(EVENT.ON_ERROR, toOnError(mediaHeartbeat)),
-      toEventDataObj(EVENT.ON_AD_ERROR, toOnAdError(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.Error, toOnError(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.AdError, toOnAdError(mediaHeartbeat)),
       // Session End
-      toEventDataObj(EVENT.ON_SOURCE_UNLOADED, toOnVideoDestroy(mediaHeartbeat))
+      toEventDataObj(
+        PlayerEvent.SourceUnloaded,
+        toOnVideoDestroy(mediaHeartbeat)
+      )
     ]);
     allTeardowns = [...allTeardowns, ...teardowns];
   };
@@ -265,7 +267,7 @@ export const HeartbeatAnalytics = function(
     ...allTeardowns,
     ...toTeardownTuples([
       toEventDataObj(
-        EVENT.ON_READY,
+        PlayerEvent.SourceLoaded,
         toOnVideoLoad(
           mediaHeartbeat,
           mediaDelegate,
@@ -276,7 +278,7 @@ export const HeartbeatAnalytics = function(
           player
         )
       ),
-      toEventDataObj(EVENT.ON_DESTROY, toOnVideoDestroy(mediaHeartbeat)),
+      toEventDataObj(PlayerEvent.Destroy, toOnVideoDestroy(mediaHeartbeat))
     ]),
     bitrateState,
     startupDeltaState,
