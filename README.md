@@ -7,7 +7,6 @@ This package allows for the integration of your Abode Video Heartbeat Analytics 
 1. Adobe Experience Cloud account
 1. Bitmovin account
 1. Node version >= v6.11.5
-1. Yarn version >= v1.0.0
 1. Video Heartbeat library = v2.0.2
 1. AppMeasurement.js from Adobe Experience Cloud
 1. VisitorAPI.js from Adobe Experience Cloud
@@ -18,8 +17,8 @@ This package allows for the integration of your Abode Video Heartbeat Analytics 
 2. Visit [Video Heartbeat Library](https://github.com/Adobe-Marketing-Cloud/video-heartbeat-v2/releases/tag/js-v2.0.2) to download `VideoHeartbeatLibrary-js-v2.0.2.zip`.
 3. Copy `VideoHeartbeat.min.js` from the libs directory in the Video Heartbeat Library to your project.
 4. Download `AppMeasurement.js` and `VisitorAPI.js` from your Adobe Experience Cloud account and place them in your project.
-5. Install required packages with `yarn install`.
-6. Build project with `yarn run build`.
+5. Install required packages with `npm ci`.
+6. Build project with `npm run build`.
 7. Compiled file can be found at `public\js\bitmovin-heartbeat.js`.
 8. Include the built file and the 3 Adobe Heartbeat JavaScript files in the body tag your root html file.
 
@@ -117,31 +116,31 @@ Note it is up to you to call teardown whenever you would destroy the player. Not
 
 To run the project during development you can run
 ```
-yarn run start
+npm run start
 ```
 this will start a webpack-dev-server that will serve the /public folder on ``localhost:8080/``
 
 If you would prefer to just build and serve the project without the live reload you can achive this by running
 ```
-yarn run build
+npm run build
 ```
 which will compile the Typescript files located in the `src/` folder into Javascript files in `/public/js` folder.
 you can then start a normal http-server with
 ```
-yarn run server
+npm run server
 ```
 
 ### Generating docs
 This project uses TypeDoc to generate docs. After Installation you can create your own copy of the documentation by running
 ```
-yarn run doc
+npm run doc
 ```
 this will generated a `doc\` folder in the root directory containing the documentation
 
 ### Prettier
 This project used Prettier for style consistency. This is built into the commit hook, however it may also be run manually through
 ```
-yarn run format
+npm run format
 ```
 
 ### adobeStub
