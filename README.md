@@ -19,7 +19,7 @@ This package allows for the integration of your Abode Video Heartbeat Analytics 
 4. Download `AppMeasurement.js` and `VisitorAPI.js` from your Adobe Experience Cloud account and place them in your project.
 5. Install required packages with `npm ci`.
 6. Build project with `npm run build`.
-7. Compiled file can be found at `public\js\bitmovin-heartbeat.js`.
+7. Compiled file can be found at `public\js\bitmovin-adobeanalytics.js`.
 8. Include the built file and the 3 Adobe Heartbeat JavaScript files in the body tag your root html file.
 
 ## Usage
