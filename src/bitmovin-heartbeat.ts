@@ -82,6 +82,7 @@ export const HeartbeatAnalytics = function(
   let allTeardowns = [];
   const {
     toVideoUID = (player: PlayerAPI) => '',
+    toCustomMetadata = (player: PlayerAPI) => '',
     toAdName = (player: PlayerAPI) => '',
     toAdId = (player: PlayerAPI) => '',
     toAdBreakPosition = (player: PlayerAPI) => null,
@@ -195,7 +196,8 @@ export const HeartbeatAnalytics = function(
   ) => () => {
     const mediaObject = toCreateMediaObject(player);
     // TODO: player.getManifest()
-    mediaHeartbeat.trackSessionStart(mediaObject, {});
+    const contextData = toCustomMetadata(player);
+    mediaHeartbeat.trackSessionStart(mediaObject, contextData);
     const teardowns = toTeardownTuples([
       // Core Playback
       toEventDataObj(PlayerEvent.Playing, onVideoPlay(mediaHeartbeat)),
