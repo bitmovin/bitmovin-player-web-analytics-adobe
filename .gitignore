@@ -1,7 +1,8 @@
 .DS_Store
 .vscode
 **/node_modules
-**/bitmovin-heartbeat.js
+**/bitmovinplayer-adobeanalytics.js
+**/bitmovinplayer-adobeanalytics*.tgz
 **/*.map
 yarn-error.log
 docs/**

@@ -3,7 +3,7 @@ const path = require('path');
 module.exports = {
   mode: 'development',
   entry: {
-    'bitmovin-heartbeat': './src/main.ts',
+    'bitmovinplayer-adobeanalytics': './src/main.ts',
     adobeStub: './src/dev/adobeStub.ts'
   },
   devtool: 'source-map',
