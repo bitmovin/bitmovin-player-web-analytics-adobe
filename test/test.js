@@ -99,8 +99,8 @@ var toDataProjectionOverrides = function(player) {
     },
     toCustomMetadata: function(player) {
       const customMetadata = {};
-      customMetadata['rtl_device'] = 'Desktop';
-      customMetadata['rtl_os'] = 'macos';
+      customMetadata['device'] = 'Desktop';
+      customMetadata['os'] = 'macos';
       return customMetadata;
     },
     toAdName: function(player, adEvent) {
