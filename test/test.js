@@ -180,7 +180,7 @@ playerInstance.load(sourceConfig).then(
   }
 );
 
-window.bitmovin.player.analytics.HeartbeatAnalytics(
+window.bitmovin.player.analytics.BitmovinPlayerAdobeVhl(
   mediaConfigObj,
   playerInstance,
   toDataProjectionOverrides(playerInstance),

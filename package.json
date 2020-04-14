@@ -7,10 +7,11 @@
     "build": "webpack",
     "serve": "http-server",
     "wp-server": "webpack-dev-server --content-base public/",
-    "start": "concurrently --kill-others \"webpack --watch -d\" \"yarn run wp-server\"",
-    "doc": "typedoc --out docs/ --target ES6 --mode modules --module commonjs src/bitmovin-heartbeat.ts ",
+    "start": "concurrently --kill-others \"webpack --watch -d\" \"npm run wp-server\"",
+    "docs": "typedoc --out docs/ --target ES6 --mode modules --module commonjs src/bitmovin-heartbeat.ts ",
     "format": "prettier --single-quote --parser typescript --write 'src/**/*.{ts,js}' 'test/**/*.{ts,js}'",
-    "precommit": "pretty-quick --staged"
+    "precommit": "pretty-quick --staged",
+    "prepare-release": "webpack --mode='production' --devtool='-' && cp public/js/bitmovinplayer-adobeanalytics.js dist/ && npm run docs && cd dist && npm pack"
   },
   "author": "",
   "license": "ISC",
