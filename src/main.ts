@@ -9,4 +9,4 @@ let w = window as any;
 w.bitmovin = w.bitmovin || {};
 w.bitmovin.player = w.bitmovin.player || {};
 w.bitmovin.player.analytics = w.bitmovin.player.analytics || {};
-w.bitmovin.player.analytics.HeartbeatAnalytics = HeartbeatAnalytics;
+w.bitmovin.player.analytics.BitmovinPlayerAdobeVhl = HeartbeatAnalytics;
