@@ -205,7 +205,7 @@ export const HeartbeatAnalytics = function(
     const mediaObject = toCreateMediaObject(player);
     // TODO: player.getManifest()
     const contextData = toCustomMetadata(player);
-    mediaHeartbeat.trackSessionStart(mediaObject, contextData);
+    mediaHeartbeat.trackSessionStart(mediaObject, Object(contextData));
     const teardowns = toTeardownTuples([
       // Core Playback
       toEventDataObj(
