@@ -65,6 +65,7 @@ The Heartbeat Analytics Function also takes a Data Projection Object which is co
 | Key               | Signature     | Required    | Description |
 | ----------------- |:-------------:|:-----------:|-----------:|
 | toVideoUID        | (player:PlayerAPI) => string | 	YES | Returns the UID for the Player|
+| toCustomMetadata  | (player:PlayerAPI) => string | 	YES | Returns the custom metadata for the Playback Session|
 
 ##### Ads
 
