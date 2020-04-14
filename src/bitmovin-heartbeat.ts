@@ -2,7 +2,6 @@ import {
   MediaHeartbeat,
   MediaHeartbeatConfig,
   MediaHeartbeatDelegate,
-  QoSObject,
   MediaObject,
   AdBreakObject,
   AdObject,
@@ -41,7 +40,7 @@ import {
 
 import HeartbeatDataProjections from './types/HeartbeatDataProjections';
 
-import { PlayerAPI, PlayerEvent, AdBreakEvent, AdEvent } from 'bitmovin-player';
+import { PlayerAPI, AdBreakEvent, AdEvent } from 'bitmovin-player';
 
 import { ChapterEvent } from './types/analytics';
 
