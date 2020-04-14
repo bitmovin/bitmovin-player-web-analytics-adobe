@@ -2,6 +2,7 @@ import { PlayerAPI } from 'bitmovin-player';
 
 export default interface HeartbeatDataProjections {
   toVideoUID: (player: PlayerAPI) => string;
+  toCustomMetadata: (player: PlayerAPI) => string;
   toAdName: (player: PlayerAPI) => string;
   toAdId: (player: PlayerAPI) => string;
   toAdBreakPosition: (player: PlayerAPI) => number | null;
