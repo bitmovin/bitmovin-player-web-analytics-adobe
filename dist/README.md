@@ -42,7 +42,7 @@ const heartbeatConfig = ({
 `ssl`: Boolean flag that indicates whether the heartbeat calls should be made over HTTPS.
 
 #### Data Projection Overrides
-The B`itmovinPlayerAdobeVhl` function also takes a Data Projection Object which is comprised of functions that will provide additional data Heartbeat may need. Not all values in this Object are required, however if your source has ads or chapters, you will need to implement the functions described under their headers.
+The `BitmovinPlayerAdobeVhl` function also takes a Data Projection Object which is comprised of functions that will provide additional data Heartbeat may need. Not all values in this Object are required, however if your source has ads or chapters, you will need to implement the functions described under their headers.
 
 ##### Required
 
