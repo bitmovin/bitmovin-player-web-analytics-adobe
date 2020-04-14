@@ -82,7 +82,7 @@ export const HeartbeatAnalytics = function(
   let allTeardowns = [];
   const {
     toVideoUID = (player: PlayerAPI) => '',
-    toCustomMetadata = (player: PlayerAPI) => '',
+    toCustomMetadata = (player: PlayerAPI) => {},
     toAdName = (player: PlayerAPI) => '',
     toAdId = (player: PlayerAPI) => '',
     toAdBreakPosition = (player: PlayerAPI) => null,
