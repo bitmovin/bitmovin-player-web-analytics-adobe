@@ -140,11 +140,22 @@ export const toSourceFramerate = (player: PlayerAPI): number | undefined => {
 };
 
 // Core playback
-export const onVideoPlay = (mediaHeartbeat: MediaHeartbeat) =>
+export const onVideoPlay = (
+  mediaHeartbeat: MediaHeartbeat,
+  player: PlayerAPI,
+  toCreateMediaObject: PlayerWithItemProjection<MediaObject, {}>,
+  toCustomMetadata: (player: PlayerAPI) => void,
+  started: () => void
+) => () => {
+  const mediaObject = toCreateMediaObject(player);
+  const contextData = toCustomMetadata(player);
+  mediaHeartbeat.trackSessionStart(mediaObject, Object(contextData));
+  started();
+};
+export const onVideoPlaying = (mediaHeartbeat: MediaHeartbeat) =>
   mediaHeartbeat.trackPlay;
 export const onVideoPause = (mediaHeartbeat: MediaHeartbeat) =>
   mediaHeartbeat.trackPause;
-
 export const toOnVideoComplete = (
   mediaHeartbeat: MediaHeartbeat,
   player: PlayerAPI,
