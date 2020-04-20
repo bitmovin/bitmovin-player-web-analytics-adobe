@@ -17,6 +17,7 @@ import {
 import {
   addPlayerEventHandler,
   onVideoPlay,
+  onVideoPlaying,
   onVideoPause,
   toOnVideoComplete,
   toStartUpTime,
@@ -131,7 +132,12 @@ export const HeartbeatAnalytics = function(
    */
   const mediaDelegate = new MediaHeartbeatDelegate();
   //Bind is needed because getCurrent time relies on a this context that it expects to be the player (SG)
-  mediaDelegate.getCurrentPlaybackTime = player.getCurrentTime.bind(player);
+  const CurrentPlaybackTime = () => {
+    const time: number = player.getCurrentTime();
+    if (isNaN(time)) return 0;
+    return time;
+  };
+  mediaDelegate.getCurrentPlaybackTime = () => CurrentPlaybackTime();
   const startupDeltaState = toStartUpTime(player);
   const bitrateState = toGetBitrate(player);
   const QoSObject = () =>
@@ -155,18 +161,21 @@ export const HeartbeatAnalytics = function(
 
   const finished = () => {
     mediaHeartbeat.trackComplete();
-    const currentPlay = allTeardowns.find(
+    const currentPlaying = allTeardowns.find(
       ([, { eventType = '' } = {}]) =>
         eventType === player.exports.PlayerEvent.Playing
     );
-    const [oldPlayTeardown, { callback: oldPlayCallback }] = currentPlay;
+    const [oldPlayTeardown, { callback: oldPlayCallback }] = currentPlaying;
     const teardown = addPlayerEventHandler(
       player,
       player.exports.PlayerEvent.Play,
       () => {
         mediaHeartbeat.trackSessionEnd();
         oldPlayTeardown();
-        mediaHeartbeat.trackSessionStart(toCreateMediaObject(player), {});
+        mediaHeartbeat.trackSessionStart(
+          toCreateMediaObject(player),
+          Object(toCustomMetadata(player))
+        );
         teardown();
         oldPlayCallback();
         allTeardowns = [
@@ -179,6 +188,21 @@ export const HeartbeatAnalytics = function(
         ];
       }
     );
+    console.log('finished');
+  };
+
+  const started = () => {
+    const currentPlayIndex = allTeardowns.findIndex(
+      ([, { eventType = '' } = {}]) =>
+        eventType === player.exports.PlayerEvent.Play
+    );
+
+    if (currentPlayIndex != -1) {
+      const [teardownPlay] = allTeardowns.splice(currentPlayIndex, 1);
+      teardownPlay[0]();
+    } else {
+      console.log('Warning: Play track handler not found...should not happen');
+    }
   };
 
   /**
@@ -202,15 +226,21 @@ export const HeartbeatAnalytics = function(
     >,
     player: PlayerAPI
   ) => () => {
-    const mediaObject = toCreateMediaObject(player);
-    // TODO: player.getManifest()
-    const contextData = toCustomMetadata(player);
-    mediaHeartbeat.trackSessionStart(mediaObject, Object(contextData));
     const teardowns = toTeardownTuples([
       // Core Playback
       toEventDataObj(
+        player.exports.PlayerEvent.Play,
+        onVideoPlay(
+          mediaHeartbeat,
+          player,
+          toCreateMediaObject,
+          toCustomMetadata,
+          started
+        )
+      ),
+      toEventDataObj(
         player.exports.PlayerEvent.Playing,
-        onVideoPlay(mediaHeartbeat)
+        onVideoPlaying(mediaHeartbeat)
       ),
       toEventDataObj(
         player.exports.PlayerEvent.PlaybackFinished,
