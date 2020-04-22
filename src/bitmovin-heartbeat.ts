@@ -132,12 +132,12 @@ export const HeartbeatAnalytics = function(
    */
   const mediaDelegate = new MediaHeartbeatDelegate();
   //Bind is needed because getCurrent time relies on a this context that it expects to be the player (SG)
-  const CurrentPlaybackTime = () => {
+  const currentPlaybackTime = () => {
     const time: number = player.getCurrentTime();
     if (isNaN(time)) return 0;
     return time;
   };
-  mediaDelegate.getCurrentPlaybackTime = () => CurrentPlaybackTime();
+  mediaDelegate.getCurrentPlaybackTime = () => currentPlaybackTime();
   const startupDeltaState = toStartUpTime(player);
   const bitrateState = toGetBitrate(player);
   const QoSObject = () =>
