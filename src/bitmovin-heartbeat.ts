@@ -41,7 +41,7 @@ import {
 
 import HeartbeatDataProjections from './types/HeartbeatDataProjections';
 
-import { PlayerAPI, AdBreakEvent, AdEvent } from 'bitmovin-player';
+import { PlayerAPI, PlayerEvent, AdBreakEvent, AdEvent } from 'bitmovin-player';
 
 import { ChapterEvent } from './types/analytics';
 
@@ -51,8 +51,7 @@ import {
   noop,
   toEventDataObj,
   toCreateHeartbeatObject,
-  toGetValue,
-  hasPostAd
+  toGetValue
 } from './utils/helpers';
 
 import {
@@ -160,48 +159,66 @@ export const HeartbeatAnalytics = function(
   );
 
   const finished = () => {
+    // send 'complete' event
     mediaHeartbeat.trackComplete();
-    const currentPlaying = allTeardowns.find(
-      ([, { eventType = '' } = {}]) =>
-        eventType === player.exports.PlayerEvent.Playing
-    );
-    const [oldPlayTeardown, { callback: oldPlayCallback }] = currentPlaying;
-    const teardown = addPlayerEventHandler(
-      player,
-      player.exports.PlayerEvent.Play,
-      () => {
-        mediaHeartbeat.trackSessionEnd();
-        oldPlayTeardown();
-        mediaHeartbeat.trackSessionStart(
-          toCreateMediaObject(player),
-          Object(toCustomMetadata(player))
-        );
-        teardown();
-        oldPlayCallback();
-        allTeardowns = [
-          ...allTeardowns,
-          addPlayerEventHandler(
-            player,
-            player.exports.PlayerEvent.Playing,
-            oldPlayCallback
-          )
-        ];
-      }
-    );
+
+    // add 'Play' event handler to handle playback restart
+    allTeardowns = [
+      ...allTeardowns,
+      ...toTeardownTuples([
+        toEventDataObj(player.exports.PlayerEvent.Play, onVideoPlay(restarted))
+      ])
+    ];
     console.log('finished');
   };
 
   const started = () => {
-    const currentPlayIndex = allTeardowns.findIndex(
-      ([, { eventType = '' } = {}]) =>
-        eventType === player.exports.PlayerEvent.Play
-    );
+    // find, teardown and remove the 'Play' event handler
+    // if event handler is not found, ignore this callback
+    if (findAndTearDownEventHandler(player.exports.PlayerEvent.Play) == false)
+      return;
 
-    if (currentPlayIndex != -1) {
-      const [teardownPlay] = allTeardowns.splice(currentPlayIndex, 1);
-      teardownPlay[0]();
+    // send 'session start' event
+    sendSessionStartEvent();
+
+    console.log('started');
+  };
+
+  const restarted = () => {
+    // find, teardown and remove the 'Play' event handler
+    // if event handler is not found, ignore this callback
+    if (findAndTearDownEventHandler(player.exports.PlayerEvent.Play) == false)
+      return;
+
+    // send 'session end' event
+    mediaHeartbeat.trackSessionEnd();
+
+    // send 'session start' event
+    sendSessionStartEvent();
+
+    console.log('re-started');
+  };
+
+  const sendSessionStartEvent = () => {
+    const mediaObject = toCreateMediaObject(player);
+    const contextData = toCustomMetadata(player);
+    mediaHeartbeat.trackSessionStart(mediaObject, Object(contextData));
+  };
+
+  const findAndTearDownEventHandler = (playerEvent: PlayerEvent) => {
+    // find and teardown the 'Play' event handler and also remove from 'allTearDowns'
+    const eventIndex = allTeardowns.findIndex(
+      ([, { eventType = '' } = {}]) => eventType === playerEvent
+    );
+    if (eventIndex != -1) {
+      const [teardownEvent] = allTeardowns.splice(eventIndex, 1);
+      teardownEvent[0]();
+      return true;
     } else {
-      console.log('Warning: Play track handler not found...should not happen');
+      console.log(
+        'Warning: <' + playerEvent + '> Event not found in teardown array...'
+      );
+      return false;
     }
   };
 
@@ -227,17 +244,7 @@ export const HeartbeatAnalytics = function(
     player: PlayerAPI
   ) => () => {
     const teardowns = toTeardownTuples([
-      // Core Playback
-      toEventDataObj(
-        player.exports.PlayerEvent.Play,
-        onVideoPlay(
-          mediaHeartbeat,
-          player,
-          toCreateMediaObject,
-          toCustomMetadata,
-          started
-        )
-      ),
+      toEventDataObj(player.exports.PlayerEvent.Play, onVideoPlay(started)),
       toEventDataObj(
         player.exports.PlayerEvent.Playing,
         onVideoPlaying(mediaHeartbeat)
@@ -315,6 +322,21 @@ export const HeartbeatAnalytics = function(
       )
     ]);
     allTeardowns = [...allTeardowns, ...teardowns];
+
+    // for auto play case, player will not send 'Play' event,
+    // so calling 'Play' event handler to simplify workflow
+    // by forcing same flow as in case of user triggered play
+    if (
+      player.getConfig().playback &&
+      player.getConfig().playback.autoplay == true
+    ) {
+      const playEvent = allTeardowns.find(
+        ([, { eventType = '' } = {}]) =>
+          eventType === player.exports.PlayerEvent.Play
+      );
+      const [playTeardown, { callback: playCallback }] = playEvent;
+      playCallback();
+    }
   };
 
   const toTeardownTuples = (eventDataObjs: EventDataObj[]) =>
