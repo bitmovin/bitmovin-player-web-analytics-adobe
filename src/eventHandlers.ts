@@ -16,14 +16,11 @@ import {
 } from './types/analytics';
 
 import {
-  hasPostAd,
   teardownAndRemove,
   framerateMap,
   toGetStreamType,
   toGetManifest
 } from './utils/helpers';
-
-import { toAdBreakNameDefault } from './utils/dataProjections';
 
 import {
   PlayerAPI,
@@ -140,17 +137,8 @@ export const toSourceFramerate = (player: PlayerAPI): number | undefined => {
 };
 
 // Core playback
-export const onVideoPlay = (
-  mediaHeartbeat: MediaHeartbeat,
-  player: PlayerAPI,
-  toCreateMediaObject: PlayerWithItemProjection<MediaObject, {}>,
-  toCustomMetadata: (player: PlayerAPI) => void,
-  started: () => void
-) => () => {
-  const mediaObject = toCreateMediaObject(player);
-  const contextData = toCustomMetadata(player);
-  mediaHeartbeat.trackSessionStart(mediaObject, Object(contextData));
-  started();
+export const onVideoPlay = (handler: () => void) => () => {
+  handler();
 };
 export const onVideoPlaying = (mediaHeartbeat: MediaHeartbeat) =>
   mediaHeartbeat.trackPlay;
@@ -162,10 +150,7 @@ export const toOnVideoComplete = (
   toCreateMediaObject: PlayerWithItemProjection<MediaObject, {}>,
   finished: () => void
 ) => () => {
-  mediaHeartbeat.trackEvent(Event.ChapterComplete);
-  if (!hasPostAd(player)) {
-    finished();
-  }
+  finished();
 };
 
 // Chapters and segments
@@ -255,9 +240,6 @@ export const toOnAdBreakComplete = (
   finished: () => void
 ) => () => {
   mediaHeartbeat.trackEvent(Event.AdBreakComplete);
-  if (toAdBreakNameDefault(player) === 'post') {
-    finished();
-  }
 };
 
 // QoS
