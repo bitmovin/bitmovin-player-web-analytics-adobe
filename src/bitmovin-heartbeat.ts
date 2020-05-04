@@ -62,9 +62,10 @@ import {
   toVideoTitle,
   toVideoDuration,
   toVideoStreamType,
-  toAdBreakName,
+  toAdBreakNameDefault,
+  toAdBreakPositionDefault,
   toAdBreakStartTime,
-  toAdPosition,
+  toAdPositionDefault,
   toAdLength,
   toDroppedFrames
 } from './utils/dataProjections';
@@ -82,9 +83,11 @@ export const HeartbeatAnalytics = function(
   const {
     toVideoUID = (player: PlayerAPI) => '',
     toCustomMetadata = (player: PlayerAPI) => {},
-    toAdName = (player: PlayerAPI) => '',
-    toAdId = (player: PlayerAPI) => '',
-    toAdBreakPosition = (player: PlayerAPI) => null,
+    toAdBreakName = toAdBreakNameDefault,
+    toAdBreakPosition = toAdBreakPositionDefault,
+    toAdName = (player: PlayerAPI, adEvent: AdEvent) => '',
+    toAdId = (player: PlayerAPI, adEvent: AdEvent) => '',
+    toAdPosition = toAdPositionDefault,
     toChapterName = toChapterNameDefault,
     toChapterPosition = toChapterPositionDefault,
     toChapterLength = toChapterLengthDefault,

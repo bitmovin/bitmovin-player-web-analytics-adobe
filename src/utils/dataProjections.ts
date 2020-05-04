@@ -42,15 +42,37 @@ export const toVideoDuration = (player: PlayerAPI) => player.getDuration();
 export const toVideoStreamType = (player: PlayerAPI) =>
   player.isLive() ? HeartbeatStreamType.LIVE : HeartbeatStreamType.VOD;
 
-export const toAdBreakName = (player: PlayerAPI, adBreakEvent: AdBreakEvent) =>
-  adBreakEvent.adBreak.id;
+export const toAdBreakNameDefault = (
+  player: PlayerAPI,
+  adBreakEvent: AdBreakEvent
+) => {
+  const duration = player.getDuration();
+  const scheduleTime = adBreakEvent.adBreak.scheduleTime;
+  if (scheduleTime === 0) return 'preroll';
+  if (scheduleTime === duration) return 'postroll';
+  return 'midroll';
+};
+
+export const toAdBreakPositionDefault = (
+  player: PlayerAPI,
+  adBreakEvent: AdBreakEvent
+) => {
+  const duration = player.getDuration();
+  const scheduleTime = adBreakEvent.adBreak.scheduleTime;
+  if (scheduleTime === 0) return 1;
+  if (scheduleTime === duration) return 3;
+  return 2;
+};
 
 export const toAdBreakStartTime = (
   player: PlayerAPI,
   adBreakEvent: AdBreakEvent
 ) => adBreakEvent.adBreak.scheduleTime;
 
-export const toAdPosition = (player: PlayerAPI, adStartedEvent: AdEvent) => {
+export const toAdPositionDefault = (
+  player: PlayerAPI,
+  adStartedEvent: AdEvent
+) => {
   const activeAdsArray = player.ads.getActiveAdBreak().ads;
   const index = activeAdsArray.findIndex(ad => ad.id === adStartedEvent.ad.id);
   return index;
@@ -77,12 +99,3 @@ export const toChapterPositionDefault = (player: PlayerAPI, e: ChapterEvent) =>
 
 export const toChapterStartTimeDefault = (player: PlayerAPI, e: ChapterEvent) =>
   e.time;
-
-export const toAdBreakNameDefault = (player: PlayerAPI) => {
-  const duration = player.getDuration();
-  const playhead = player.getCurrentTime();
-  //TODO: playhead === duration is not confirmed for live streams. Need to verify that and potentially refactor.
-  if (playhead === duration) return 'post';
-  if (playhead === 0) return 'pre';
-  return 'mid';
-};
