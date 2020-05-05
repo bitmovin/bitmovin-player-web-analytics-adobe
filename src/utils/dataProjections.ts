@@ -49,7 +49,7 @@ export const toAdBreakNameDefault = (
   const duration = player.getDuration();
   const scheduleTime = adBreakEvent.adBreak.scheduleTime;
   if (scheduleTime === 0) return 'preroll';
-  if (scheduleTime === duration) return 'postroll';
+  if (scheduleTime >= duration) return 'postroll';
   return 'midroll';
 };
 
@@ -60,7 +60,7 @@ export const toAdBreakPositionDefault = (
   const duration = player.getDuration();
   const scheduleTime = adBreakEvent.adBreak.scheduleTime;
   if (scheduleTime === 0) return 1;
-  if (scheduleTime === duration) return 3;
+  if (scheduleTime >= duration) return 3;
   return 2;
 };
 
