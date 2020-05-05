@@ -50,24 +50,39 @@ var sourceConfig = {
 
 var toDataProjectionOverrides = function(player) {
   var ID_LOCATION = 4;
-  var startedAdBreaksMap = new Map();
+  var consumedAdBreaksMap = new Map();
+  var activeAdBreakId = '';
+  var adPosIdxInAdBreak = 0;
 
-  function updateStartedAdBreaksMap(adBreakEvent) {
-    startedAdBreaksMap.set(JSON.stringify(adBreakEvent), adBreakEvent);
-    return Array.from(startedAdBreaksMap.values());
+  function updateConsumedAdBreaksMap(adBreak) {
+    if (!consumedAdBreaksMap.has(adBreak.id)) {
+      consumedAdBreaksMap.set(adBreak.id, adBreak);
+    }
+    return consumedAdBreaksMap;
   }
 
-  function sortedAdBreakSlots(adBreakEvent) {
-    var adBreaks = player.getConfig().advertising.adBreaks;
-    var previousAdBreaks = updateStartedAdBreaksMap(adBreakEvent);
-    var scheduledAdBreaks = player.ads.list();
-    var mergedAdBreakSlots = previousAdBreaks.concat(scheduledAdBreaks);
+  function prepareAllAdBreaksArr(consumedAdBreaksMap, scheduledAdBreaks) {
+    var allAdBreaksMap = consumedAdBreaksMap;
+    scheduledAdBreaks.forEach(adBreak => {
+      if (!allAdBreaksMap.has(adBreak.id)) {
+        allAdBreaksMap.set(adBreak.id, adBreak);
+      }
+    });
+    return Array.from(allAdBreaksMap.values());
+  }
+
+  function sortedAdBreakSlots(adBreak) {
+    var consumedAdBreaksMap = updateConsumedAdBreaksMap(adBreak);
+    var mergedAdBreakSlots = prepareAllAdBreaksArr(
+      consumedAdBreaksMap,
+      player.ads.list()
+    );
 
     return Object.keys(mergedAdBreakSlots)
       .map(function(key) {
         return [
-          JSON.stringify(mergedAdBreakSlots[key]),
-          normalizeAdTime(mergedAdBreakSlots[key].position)
+          mergedAdBreakSlots[key].id,
+          mergedAdBreakSlots[key].scheduleTime
         ];
       })
       .sort(compareAdBreaks);
@@ -77,19 +92,6 @@ var toDataProjectionOverrides = function(player) {
     return a[1] - b[1];
   }
 
-  function normalizeAdTime(offset) {
-    var specials = {
-      pre: 0,
-      post: 100
-    };
-    //need explicit undefined due to value can = 0
-    return specials[offset] !== undefined
-      ? specials[offset]
-      : //replace with special or remove all non numeric values
-        parseInt(offset.replace(/\D*/, ''));
-  }
-
-  //TODO: Add documentation / comments so others can understand this
   return {
     //In a real implementation you would want to derive this
     toVideoUID: function(player) {
@@ -102,6 +104,17 @@ var toDataProjectionOverrides = function(player) {
       customMetadata['device'] = 'Desktop';
       customMetadata['os'] = 'macos';
       return customMetadata;
+    },
+    toAdBreakName: function(player, adBreakEvent) {
+      return adBreakEvent.adBreak.id;
+    },
+    toAdBreakPosition: function(player, adBreakEvent) {
+      var adBreaksSlots = sortedAdBreakSlots(adBreakEvent.adBreak);
+      var adBreakIndex = adBreaksSlots.findIndex(function(slot) {
+        return slot[0] === adBreakEvent.adBreak.id;
+      });
+      // The positions of the ad breaks in the content start with 1
+      return adBreakIndex + 1;
     },
     toAdName: function(player, adEvent) {
       //TODO: We are heavily abusing the fact we know the format of the click-through to parse it.
@@ -117,18 +130,15 @@ var toDataProjectionOverrides = function(player) {
       var getAdInfo = /(sig=)(.+?)(?=\&|$)/.exec(url);
       return getAdInfo[2];
     },
-
-    //TODO: We are using AdBreakName as a source of truth to signify adBreak Change.
-    //      Might hit race problems or other problems if the two functions desync
-    toAdBreakPosition: function(player, adBreakEvent) {
-      var adBreaksSlots = sortedAdBreakSlots(adBreakEvent.adBreak);
-
-      var adBreakIndex = adBreaksSlots.findIndex(function(slot) {
-        return slot[0] === JSON.stringify(adBreakEvent.adBreak);
-      });
-
-      // The positions of the ad breaks in the content start with 1
-      return adBreakIndex + 1;
+    toAdPosition: function(player, adStartedEvent) {
+      const currentAdBreakId = player.ads.getActiveAdBreak().id;
+      if (currentAdBreakId != activeAdBreakId) {
+        activeAdBreakId = currentAdBreakId;
+        adPosIdxInAdBreak = 1;
+      } else {
+        adPosIdxInAdBreak = adPosIdxInAdBreak + 1;
+      }
+      return adPosIdxInAdBreak;
     },
     toChapterName: function(player, chapterEvent) {
       return chapterEvent.title;

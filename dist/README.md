@@ -49,23 +49,26 @@ The `BitmovinPlayerAdobeVhl` function also takes a Data Projection Object which 
 | Key               | Signature     | Required    | Description |
 | ----------------- |:-------------:|:-----------:|-----------:|
 | toVideoUID        | (player:PlayerAPI) => string | 	YES | Returns the UID for the Player|
+| toCustomMetadata  | (player:PlayerAPI) => string | 	YES | Returns the custom metadata for the Playback Session|
 
 ##### Ads
 
 | Key               | Signature     | Required    | Description |
 | ----------------- |:-------------:|:-----------:|-----------:|
+| toAdBreakName     | (player:PlayerAPI, adBreakEvent:AdBreakEvent) => string | YES | Returns the name of the current AdBreak|
+| toAdBreakPosition | (player:PlayerAPI, adBreakEvent:AdBreakEvent) => number | YES | Returns the number of the current AdBreak|
 | toAdName          | (player:PlayerAPI, adEvent:AdEvent) => string | YES | Returns the Name of the current Ad|
 | toAdId            | (player:PlayerAPI, adEvent:AdEvent) => string | YES | Returns the ID for the current Ad|
-| toAdBreakPosition | (player:PlayerAPI, adBreakEvent:AdBreakEvent) => number | YES |Returns the number of the current AdBreak|
+| toAdPosition      | (player:PlayerAPI, adEvent:AdEvent) => number | YES | Returns the number of the current Ad within current AdBreak|
 
 ##### Chapters
 
 | Key               | Signature     | Required    | Description |
 | ----------------- |:-------------:|:-----------:|-----------:|
 | toChapterName     | (player:PlayerAPI, chapterEvent:ChapterEvent) => string | 	NO | Returns the name of the current Chapter |
-| toChapterPosition | (player:PlayerAPI, chapterEvent:ChapterEvent) => number | 	NO |Returns the number of the current Chapter|
-| toChapterLength   | (player:PlayerAPI, chapterEvent:ChapterEvent) => number | 	NO |Returns the length of the chapter in seconds|
-| toChapterStartTime| (player:PlayerAPI, chapterEvent:ChapterEvent) => number | 	NO |Returns the start time in seconds of the current chapter|
+| toChapterPosition | (player:PlayerAPI, chapterEvent:ChapterEvent) => number | 	NO | Returns the number of the current Chapter|
+| toChapterLength   | (player:PlayerAPI, chapterEvent:ChapterEvent) => number | 	NO | Returns the length of the chapter in seconds|
+| toChapterStartTime| (player:PlayerAPI, chapterEvent:ChapterEvent) => number | 	NO | Returns the start time in seconds of the current chapter|
 
 Example can be viewed in `public/js/index.js`
 
