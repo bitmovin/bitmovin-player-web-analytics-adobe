@@ -82,6 +82,7 @@ const cleanup = window.bitmovin.player.analytics.BitmovinPlayerAdobeVhl(
   dataProjectionOverrides = {}
 );
 ```
+Note, the registration of playback event callbacks with player should be done after registering the player instance to your Heartbeat server. Not doing so may cause errors.
 
 ### Cleanup
 `window.bitmovin.player.analytics.BitmovinPlayerAdobeVhl` returns a teardown method that tells the system that you are done tracking and it should begin garbage collection. When you have finished with a player just invoke the related Teardown to stop tracking
