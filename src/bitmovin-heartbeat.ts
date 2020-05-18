@@ -253,10 +253,6 @@ export const HeartbeatAnalytics = function(
         onVideoPlaying(mediaHeartbeat)
       ),
       toEventDataObj(
-        player.exports.PlayerEvent.PlaybackFinished,
-        toOnVideoComplete(mediaHeartbeat, player, toCreateMediaObject, finished)
-      ),
-      toEventDataObj(
         player.exports.PlayerEvent.Paused,
         onVideoPause(mediaHeartbeat)
       ),
@@ -372,6 +368,10 @@ export const HeartbeatAnalytics = function(
           toCreateChapterObject,
           player
         )
+      ),
+      toEventDataObj(
+          player.exports.PlayerEvent.PlaybackFinished,
+          toOnVideoComplete(finished)
       ),
       toEventDataObj(
         player.exports.PlayerEvent.Destroy,
