@@ -145,9 +145,6 @@ export const onVideoPlaying = (mediaHeartbeat: MediaHeartbeat) =>
 export const onVideoPause = (mediaHeartbeat: MediaHeartbeat) =>
   mediaHeartbeat.trackPause;
 export const toOnVideoComplete = (
-  mediaHeartbeat: MediaHeartbeat,
-  player: PlayerAPI,
-  toCreateMediaObject: PlayerWithItemProjection<MediaObject, {}>,
   finished: () => void
 ) => () => {
   finished();
