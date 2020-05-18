@@ -370,8 +370,8 @@ export const HeartbeatAnalytics = function(
         )
       ),
       toEventDataObj(
-          player.exports.PlayerEvent.PlaybackFinished,
-          toOnVideoComplete(finished)
+        player.exports.PlayerEvent.PlaybackFinished,
+        toOnVideoComplete(finished)
       ),
       toEventDataObj(
         player.exports.PlayerEvent.Destroy,
