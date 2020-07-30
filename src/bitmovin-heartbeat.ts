@@ -187,7 +187,6 @@ export const HeartbeatAnalytics = function(
     // send 'session start' event
     sendSessionStartEvent();
 
-    console.log('started');
     logger('started');
   };
 
