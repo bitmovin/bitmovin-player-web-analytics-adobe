@@ -106,22 +106,27 @@ export interface MediaHeartbeatPass extends MediaHeartbeat {
   mediaHeartbeatReal: MediaHeartbeat;
 }
 export class MediaHeartbeatPass implements MediaHeartbeatPass {
+  isDebugLoggingEnabled: boolean;
   constructor(
     public mediaDelegate: MediaHeartbeatDelegate,
     public config: MediaHeartbeatConfig,
-    public appMeasurement: Object = {}
+    public appMeasurement: Object = {},
+    enableDebugLogs=false
   ) {
     this.mediaHeartbeatReal = new MediaHeartbeat(
       mediaDelegate,
       config,
       appMeasurement
     );
+    this.isDebugLoggingEnabled = enableDebugLogs;
   }
 
   logUpdate = (event: string) => {
-    console.log({
-      event
-    });
+    if (this.isDebugLoggingEnabled == true) {
+      console.log({
+        event
+      });
+    }
   };
 
   trackSessionStart = (mediaObject: MediaObject, customVideoMeta: Object) => {

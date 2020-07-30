@@ -77,8 +77,10 @@ export const HeartbeatAnalytics = function(
   mediaConfigObj: MediaHeartbeatConfig,
   player: PlayerAPI,
   heartbeatDataProjections: HeartbeatDataProjections,
-  appMeasurement
+  appMeasurement,
+  enableDebugLogs=false
 ) {
+  let isDebugLoggingEnabled = enableDebugLogs;
   let allTeardowns = [];
   const {
     toVideoUID = (player: PlayerAPI) => '',
@@ -158,7 +160,8 @@ export const HeartbeatAnalytics = function(
   const mediaHeartbeat = new MediaHeartbeatPass(
     mediaDelegate,
     mediaConfigObj,
-    appMeasurement
+    appMeasurement,
+    isDebugLoggingEnabled
   );
 
   const finished = () => {
@@ -172,7 +175,7 @@ export const HeartbeatAnalytics = function(
         toEventDataObj(player.exports.PlayerEvent.Play, onVideoPlay(restarted))
       ])
     ];
-    console.log('finished');
+    logger('finished');
   };
 
   const started = () => {
@@ -185,6 +188,7 @@ export const HeartbeatAnalytics = function(
     sendSessionStartEvent();
 
     console.log('started');
+    logger('started');
   };
 
   const restarted = () => {
@@ -199,7 +203,7 @@ export const HeartbeatAnalytics = function(
     // send 'session start' event
     sendSessionStartEvent();
 
-    console.log('re-started');
+    logger('re-started');
   };
 
   const sendSessionStartEvent = () => {
@@ -218,7 +222,7 @@ export const HeartbeatAnalytics = function(
       teardownEvent[0]();
       return true;
     } else {
-      console.log(
+      console.log (
         'Warning: <' + playerEvent + '> Event not found in teardown array...'
       );
       return false;
@@ -382,6 +386,14 @@ export const HeartbeatAnalytics = function(
     startupDeltaState,
     [toOnVideoDestroy(mediaHeartbeat), {}]
   ];
+
+  const logger = (msg: string) => {
+    if (isDebugLoggingEnabled == true) {
+      console.log({
+        msg
+      });
+    }
+  };
 
   // TODO: Cleanup ADB refs if necessary (CJP)
   const tearDown = () => {
