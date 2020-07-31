@@ -121,7 +121,7 @@ export class MediaHeartbeatPass implements MediaHeartbeatPass {
 
   logDebug = (event: string) => {
     if (this.enableDebugLogs) {
-      console.log('[DEBUG] [plugin::bitmovin-adobe-analytics] : ' + event);
+      console.debug('[plugin::bitmovin-adobe-analytics] : ' + event);
     }
   };
 

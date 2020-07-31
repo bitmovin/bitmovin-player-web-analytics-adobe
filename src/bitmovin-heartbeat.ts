@@ -386,12 +386,12 @@ export const HeartbeatAnalytics = function(
 
   const logDebug = (msg: string) => {
     if (isDebugLoggingEnabled) {
-      console.log('[DEBUG] [plugin::bitmovin-adobe-analytics] : ' + msg);
+      console.debug('[plugin::bitmovin-adobe-analytics] : ' + msg);
     }
   };
 
   const logWarning = (msg: string) => {
-    console.log('[WARNING] [plugin::bitmovin-adobe-analytics] : ' + msg);
+    console.warn('[plugin::bitmovin-adobe-analytics] : ' + msg);
   };
 
   // TODO: Cleanup ADB refs if necessary (CJP)
