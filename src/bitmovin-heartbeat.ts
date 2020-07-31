@@ -78,7 +78,7 @@ export const HeartbeatAnalytics = function(
   player: PlayerAPI,
   heartbeatDataProjections: HeartbeatDataProjections,
   appMeasurement,
-  enableDebugLogs=false
+  enableDebugLogs = false
 ) {
   let isDebugLoggingEnabled = enableDebugLogs;
   let allTeardowns = [];
@@ -175,7 +175,7 @@ export const HeartbeatAnalytics = function(
         toEventDataObj(player.exports.PlayerEvent.Play, onVideoPlay(restarted))
       ])
     ];
-    logger('finished');
+    logDebug('finished');
   };
 
   const started = () => {
@@ -187,7 +187,7 @@ export const HeartbeatAnalytics = function(
     // send 'session start' event
     sendSessionStartEvent();
 
-    logger('started');
+    logDebug('started');
   };
 
   const restarted = () => {
@@ -202,7 +202,7 @@ export const HeartbeatAnalytics = function(
     // send 'session start' event
     sendSessionStartEvent();
 
-    logger('re-started');
+    logDebug('re-started');
   };
 
   const sendSessionStartEvent = () => {
@@ -221,9 +221,7 @@ export const HeartbeatAnalytics = function(
       teardownEvent[0]();
       return true;
     } else {
-      console.log (
-        'Warning: <' + playerEvent + '> Event not found in teardown array...'
-      );
+      logWarning('<' + playerEvent + '> Event not found in teardown array...');
       return false;
     }
   };
@@ -386,12 +384,14 @@ export const HeartbeatAnalytics = function(
     [toOnVideoDestroy(mediaHeartbeat), {}]
   ];
 
-  const logger = (msg: string) => {
-    if (isDebugLoggingEnabled == true) {
-      console.log({
-        msg
-      });
+  const logDebug = (msg: string) => {
+    if (isDebugLoggingEnabled) {
+      console.log('[DEBUG] [plugin::bitmovin-adobe-analytics] : ' + msg);
     }
+  };
+
+  const logWarning = (msg: string) => {
+    console.log('[WARNING] [plugin::bitmovin-adobe-analytics] : ' + msg);
   };
 
   // TODO: Cleanup ADB refs if necessary (CJP)
