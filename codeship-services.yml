@@ -1,0 +1,10 @@
+
+bitmovin:
+  build:
+    image: bitmovin
+    dockerfile: build/Dockerfile
+  cached: true
+  encrypted_env_file: codeship-env.encrypted
+  default_cache_branch: "develop"
+  volumes:
+    - ./dist:/bitmovin/dist
