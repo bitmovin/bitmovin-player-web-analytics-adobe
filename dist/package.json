@@ -1,5 +1,5 @@
 {
-  "name": "bitmovinplayer-adobeanalytics",
+  "name": "@bitmovin/player-integration-adobe",
   "description": "Adobe Heartbeat Analytics integration for the Bitmovin Player",
   "version": "1.0.0",
   "homepage": "https://bitmovin.com",
