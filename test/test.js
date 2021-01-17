@@ -9,21 +9,21 @@ var playerConfig = {
         tag: {
           url:
             'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=%2F32573358%2Fskippable_ad_unit&gdfp_req=1&env=vp&output=xml_vast3&unviewed_position_start=1&eid=495644008&sdkv=h.3.198.2&sdki=3c0d&correlator=1919695060472234&scor=2016491895316387&adk=3454041677&media_url=blob%3Ahttp%253a%2F%2Flocalhost%253a8080%2F292b4e26-2725-457e-8a69-e5f90e472b28&u_so=l&osd=2&frm=0&sdr=1&is_amp=0&adsid=NT&jar=2018-3-29-13&mpt=bitmovin-player&afvsz=450x50%2C468x60%2C480x70&url=null&ged=ve4_td3_tt0_pd3_la3000_er0.0.0.0_vi0.0.862.539_vp0_eb16491',
-          type: 'vast'
+          type: 'vast',
         },
         id: 'pre-roll-1',
-        position: 'pre'
+        position: 'pre',
       },
       {
         tag: {
           url:
             'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=',
-          type: 'vast'
+          type: 'vast',
         },
         id: 'post-roll-1',
-        position: 'post'
-      }
-    ]
+        position: 'post',
+      },
+    ],
   },
   ui: {
     metadata: {
@@ -31,21 +31,18 @@ var playerConfig = {
         { time: 24, title: 'First Chapter' },
         { time: 69, title: 'Chapter 2' },
         { time: 105, title: 'Chapter 3' },
-        { time: 188, duration: 11, title: 'Last Chapter' }
-      ]
-    }
-  }
+        { time: 188, duration: 11, title: 'Last Chapter' },
+      ],
+    },
+  },
 };
 
 var sourceConfig = {
   title: 'Red Bull Parkour',
-  dash:
-    '//bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd',
-  hls:
-    '//bitmovin-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
-  progressive:
-    '//bitmovin-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
-  poster: '//bitmovin-a.akamaihd.net/content/MI201109210084_1/poster.jpg'
+  dash: '//bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd',
+  hls: '//bitmovin-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
+  progressive: '//bitmovin-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
+  poster: '//bitmovin-a.akamaihd.net/content/MI201109210084_1/poster.jpg',
 };
 
 var toDataProjectionOverrides = function(player) {
@@ -73,17 +70,11 @@ var toDataProjectionOverrides = function(player) {
 
   function sortedAdBreakSlots(adBreak) {
     var consumedAdBreaksMap = updateConsumedAdBreaksMap(adBreak);
-    var mergedAdBreakSlots = prepareAllAdBreaksArr(
-      consumedAdBreaksMap,
-      player.ads.list()
-    );
+    var mergedAdBreakSlots = prepareAllAdBreaksArr(consumedAdBreaksMap, player.ads.list());
 
     return Object.keys(mergedAdBreakSlots)
       .map(function(key) {
-        return [
-          mergedAdBreakSlots[key].id,
-          mergedAdBreakSlots[key].scheduleTime
-        ];
+        return [mergedAdBreakSlots[key].id, mergedAdBreakSlots[key].scheduleTime];
       })
       .sort(compareAdBreaks);
   }
@@ -153,7 +144,7 @@ var toDataProjectionOverrides = function(player) {
     },
     toChapterStartTime: function(player, chapterEvent) {
       return chapterEvent.time;
-    }
+    },
   };
 };
 
@@ -162,11 +153,11 @@ var visitor = Visitor.getInstance('ADOBE ORGANIZATION ID');
 visitor.trackingServer = TRACKING_SERVER;
 visitor.setCustomerIDs({
   userId: {
-    id: 'sample-dpid'
+    id: 'sample-dpid',
   },
   puuid: {
-    id: 'sample-dpuuid'
-  }
+    id: 'sample-dpuuid',
+  },
 });
 appMeasurement.visitor = visitor;
 appMeasurement.trackingServer = TRACKING_SERVER;
@@ -180,25 +171,22 @@ const mediaConfigObj = {
   channel: '',
   appVersion: '',
   debugLogging: false,
-  ssl: false
+  ssl: false,
 };
 
-var playerInstance = new bitmovin.player.Player(
-  document.getElementById('player'),
-  playerConfig
-);
+var playerInstance = new bitmovin.player.Player(document.getElementById('player'), playerConfig);
 playerInstance.load(sourceConfig).then(
   function() {
     console.log('Successfully created bitmovin player instance');
   },
   function(reason) {
     console.log('Error while creating bitmovin player instance');
-  }
+  },
 );
 
 window.bitmovin.player.analytics.AdobeAnalytics(
   mediaConfigObj,
   playerInstance,
   toDataProjectionOverrides(playerInstance),
-  appMeasurement
+  appMeasurement,
 );

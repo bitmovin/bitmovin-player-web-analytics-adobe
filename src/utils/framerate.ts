@@ -12,8 +12,7 @@ const includesFramerate = (s: string) => s.indexOf('FRAME-RATE') >= 0; // IE11 d
  * Takes a DOM node and checks if its nodeName is 'frameRate' (for MPEG-Dash manifests).
  * @param attr
  */
-const framerateNodeName = (attr: Node): boolean =>
-  attr.nodeName === 'frameRate';
+const framerateNodeName = (attr: Node): boolean => attr.nodeName === 'frameRate';
 
 /**
  * Computes the framerate from the shape of an MPEG-Dash framerate value (F or F/D).
@@ -32,9 +31,7 @@ const fromFramerateAttr = (s: string) => {
  */
 const toFramerateFromString = (line: string) => {
   const framerateAttr = line.split(',').find(includesFramerate);
-  const framerate = parseFloat(
-    framerateAttr.substr(framerateAttr.indexOf('=') + 1)
-  );
+  const framerate = parseFloat(framerateAttr.substr(framerateAttr.indexOf('=') + 1));
   return { framerate };
 };
 
@@ -44,10 +41,7 @@ const toFramerateFromString = (line: string) => {
  * @returns an Object with a framerate property.
  */
 const toFramerateFromElement = (node: Element): FramerateObj => {
-  const framerateAttr: Node = Array.prototype.find.call(
-    node.attributes,
-    framerateNodeName
-  );
+  const framerateAttr: Node = Array.prototype.find.call(node.attributes, framerateNodeName);
   if (!framerateAttr) return { framerate: undefined };
   const framerate = fromFramerateAttr(framerateAttr.nodeValue);
   return { framerate };
@@ -60,10 +54,7 @@ const toFramerateFromElement = (node: Element): FramerateObj => {
  */
 const toFramerate = (x: string | Element): FramerateObj =>
   typeof x === 'string' ? toFramerateFromString(x) : toFramerateFromElement(x);
-const framerateDesc = (
-  { framerate: a }: FramerateObj,
-  { framerate: b }: FramerateObj
-) => b - a;
+const framerateDesc = ({ framerate: a }: FramerateObj, { framerate: b }: FramerateObj) => b - a;
 
 /**
  * Parses an HLS manifest for instances of the FRAME-RATE property and provides the highest
@@ -71,9 +62,7 @@ const framerateDesc = (
  * @param manifest HLS manifest
  * @returns Number representing the highest framerate in HLS manifest, or undefined
  */
-export const FramerateProjectionHLS = (
-  manifest?: string
-): number | undefined => {
+export const FramerateProjectionHLS = (manifest?: string): number | undefined => {
   if (!manifest) return FramerateProjectionDefault();
   const lines = manifest.split(/\s*?\r?\n\s*?/);
   const framerates = lines
@@ -90,9 +79,7 @@ export const FramerateProjectionHLS = (
  * @param manifest MPEG-Dash manifest
  * @returns Number representing the highest framerate in MPEG-Dash manifest, or undefined
  */
-export const FramerateProjectionDash = (
-  manifest?: string
-): number | undefined => {
+export const FramerateProjectionDash = (manifest?: string): number | undefined => {
   if (!manifest) return FramerateProjectionDefault();
   const parser = new DOMParser();
   // TODO: AdaptationSet tags also have "min" and "max" frame rate attributes
@@ -100,26 +87,17 @@ export const FramerateProjectionDash = (
   //       Representations in the AdaptationSet.
   //       Might be worth looking in to.
   const adaptationSetSelector = 'AdaptationSet[frameRate]:not([frameRate=""])';
-  const representationSelector =
-    'Representation[frameRate]:not([frameRate=""])';
-  const subRepresentationSelector =
-    'SubRepresentation[frameRate]:not([frameRate=""])';
-  const manifestDOM: XMLDocument = parser.parseFromString(
-    manifest,
-    'application/xml'
-  );
+  const representationSelector = 'Representation[frameRate]:not([frameRate=""])';
+  const subRepresentationSelector = 'SubRepresentation[frameRate]:not([frameRate=""])';
+  const manifestDOM: XMLDocument = parser.parseFromString(manifest, 'application/xml');
   const tags = manifestDOM.querySelectorAll(
-    `${adaptationSetSelector}, ${representationSelector}, ${subRepresentationSelector}`
+    `${adaptationSetSelector}, ${representationSelector}, ${subRepresentationSelector}`,
   );
-  const framerates = Array.prototype.map
-    .call(tags, toFramerate)
-    .sort(framerateDesc);
+  const framerates = Array.prototype.map.call(tags, toFramerate).sort(framerateDesc);
   // TODO: Currently just the largest value, could be fancier.
   return framerates[0] && framerates[0].framerate;
 };
 
-export const FramerateProjectionDefault = (
-  manifest?: string
-): number | undefined => {
+export const FramerateProjectionDefault = (manifest?: string): number | undefined => {
   return undefined;
 };
