@@ -47,31 +47,21 @@ export enum Event {
   BitrateChange = 'bitrateChange',
   ChapterStart = 'chapterStart',
   ChapterComplete = 'chapterComplete',
-  ChapterSkip = 'chapterSkip'
+  ChapterSkip = 'chapterSkip',
 }
 
 export enum StreamType {
   VOD = 'VOD',
   LIVE = 'LIVE',
-  LINEAR = 'LINEAR'
+  LINEAR = 'LINEAR',
 }
 
 export interface CreateQoSObject {
-  (
-    bitrate: number,
-    startUpTime: number,
-    fps: number,
-    droppedFrames: number
-  ): QoSObject;
+  (bitrate: number, startUpTime: number, fps: number, droppedFrames: number): QoSObject;
 }
 
 export interface CreateMediaObject {
-  (
-    name: string,
-    mediaId: string,
-    length: number,
-    streamType: string
-  ): MediaObject;
+  (name: string, mediaId: string, length: number, streamType: string): MediaObject;
 }
 
 export interface CreateAdBreakObject {
@@ -83,20 +73,11 @@ export interface CreateAdObject {
 }
 
 export interface CreateChapterObject {
-  (
-    name: string,
-    position: number,
-    length: number,
-    startTime: number
-  ): ChapterObject;
+  (name: string, position: number, length: number, startTime: number): ChapterObject;
 }
 
 export interface MediaHeartbeatCtor {
-  new (
-    delegate: MediaHeartbeatDelegate,
-    config: MediaHeartbeatConfig,
-    appMeasurement: Object
-  ): MediaHeartbeat;
+  new (delegate: MediaHeartbeatDelegate, config: MediaHeartbeatConfig, appMeasurement: Object): MediaHeartbeat;
   createQoSObject: CreateQoSObject;
   createMediaObject: CreateMediaObject;
   createAdBreakObject: CreateAdBreakObject;
@@ -108,20 +89,12 @@ export interface MediaHeartbeat {
   trackPause: () => void;
   trackPlay: () => void;
   trackComplete: () => void;
-  trackSessionStart: (
-    mediaObj: MediaObject,
-    customVideoMetadata: Object
-  ) => void;
+  trackSessionStart: (mediaObj: MediaObject, customVideoMetadata: Object) => void;
   trackSessionEnd: () => void;
   trackEvent: (
     eventName: Event,
-    mediaObj?:
-      | MediaObject
-      | QoSObject
-      | AdObject
-      | AdBreakObject
-      | ChapterObject,
-    context?: Object
+    mediaObj?: MediaObject | QoSObject | AdObject | AdBreakObject | ChapterObject,
+    context?: Object,
   ) => void;
   trackError: (errorId: string) => void;
   // TODO: Revisit me on whether we should add this to the interface, given that we don't use it from
@@ -161,7 +134,10 @@ interface ADB {
   };
 }
 
-declare const ADB: ADB;
-export const MediaHeartbeat = ADB.va.MediaHeartbeat;
-export const MediaHeartbeatConfig = ADB.va.MediaHeartbeatConfig;
-export const MediaHeartbeatDelegate = ADB.va.MediaHeartbeatDelegate;
+// TODO avoid redeclaration
+/* eslint-disable no-redeclare */
+declare const adb: ADB;
+export const MediaHeartbeat = adb.va.MediaHeartbeat;
+export const MediaHeartbeatConfig = adb.va.MediaHeartbeatConfig;
+export const MediaHeartbeatDelegate = adb.va.MediaHeartbeatDelegate;
+/* eslint-enable no-redeclare */
