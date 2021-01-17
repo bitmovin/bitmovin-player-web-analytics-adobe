@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Adobe analytics integration for the Bitmovin Player",
   "main": "./dist/bitmovin-player-adobe-analytics.js",
+  "private": false,
   "scripts": {
     "build": "webpack",
     "serve": "http-server",
@@ -14,8 +15,18 @@
     "prepare-release": "webpack --mode='production' --devtool='-' && cp public/js/bitmovin-player-adobe-analytics.js dist/ && npm run docs",
     "prepublishOnly": "npm run prepare-release"
   },
-  "author": "Bitmovin",
+  "author": {
+    "name": "Bitmovin"
+  },
   "license": "MIT",
+  "homepage": "https://bitmovin.com",
+  "keywords": [
+    "adobe analytics",
+    "adobe vhl",
+    "adobe heartbeat",
+    "bitmovin player",
+    "video player"
+  ],
   "devDependencies": {
     "bitmovin-player": "^8.31.0",
     "bitmovin-player-ui": "^3.10.0",
