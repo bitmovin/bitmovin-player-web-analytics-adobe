@@ -17,6 +17,6 @@
     "type": "git",
     "url": ""
   },
-  "main": "./bitmovinplayer-adobeanalytics.js",
+  "main": "./bitmovin-player-adobe-analytics.js",
   "private": false
 }

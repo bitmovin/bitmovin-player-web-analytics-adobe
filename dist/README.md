@@ -8,7 +8,7 @@
 
 ## Usage
 ----------------
-`bitmovinplayer-adobeanalytics.js` provides information for each video uniquely. To handle this each instance of the Bitmovin player needs to be passed to the analytics function. This function is exposed on the window at `window.bitmovin.player.analytics.BitmovinPlayerAdobeVhl`
+`bitmovin-player-adobe-analytics.js` provides information for each video uniquely. To handle this each instance of the Bitmovin player needs to be passed to the analytics function. This function is exposed on the window at `window.bitmovin.player.analytics.AdobeAnalytics`
 
 ### Configuration
 
