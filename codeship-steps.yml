@@ -1,0 +1,7 @@
+- service: bitmovin
+  name:    Code Style (Linting)
+  command: bash -c 'cd /bitmovin; npm run lint'
+
+- service: bitmovin
+  name:    Build integration
+  command: bash -c 'cd /bitmovin; npm run prepare-release'
