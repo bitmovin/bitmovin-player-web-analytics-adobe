@@ -24,12 +24,12 @@ This package allows for the integration of your Abode Video Heartbeat Analytics 
 
 ## Usage
 ----------------
-bitmovin-player-analytics-adobe provides information for each video uniquely. To handle this each instance of the Bitmovin player needs to be passed to the analytics function. This function is exposed on the window at `window.bitmovin.player.analytics.HeartbeatAnalytics`
+bitmovin-player-analytics-adobe provides information for each video uniquely. To handle this each instance of the Bitmovin player needs to be passed to the analytics function. This function is exposed on the window at `window.bitmovin.player.analytics.AdobeAnalytics`
 
 ### Configuration
 
 #### Heartbeat Config
-Once initializing a player instance, you need to pass it to the HeartbeatAnalytics function to register it with your heartbeat account providing a configuration object as the first argument. All fields in the heartbeatConfig are required.
+Once initializing a player instance, you need to pass it to the `AdobeAnalytics` function to register it with your heartbeat account providing a configuration object as the first argument. All fields in the heartbeatConfig are required.
 
 ```
 const heartbeatConfig = ({
@@ -89,10 +89,10 @@ The Heartbeat Analytics Function also takes a Data Projection Object which is co
 Example can be viewed in `public/js/index.js`
 
 ### Registration
-To register a player to your Heartbeat server and begin tracking, invoke the HeartbeatAnalytics function found in the player analytics
+To register a player to your Heartbeat server and begin tracking, invoke the AdobeAnalytics function found in the player analytics
 
 ```
-const cleanup = window.bitmovin.player.analytics.HeartbeatAnalytics(
+const cleanup = window.bitmovin.player.analytics.AdobeAnalytics(
   heartbeatConfig,
   player,
   dataProjectionOverrides = {}
@@ -101,7 +101,7 @@ const cleanup = window.bitmovin.player.analytics.HeartbeatAnalytics(
 Note, the registration of playback event callbacks with player should be done after registering the player instance to your Heartbeat server. Not doing so may cause errors.
 
 ### Cleanup
-`window.bitmovin.player.analytics.HeartbeatAnalytics` returns a teardown method that tells the system that you are done tracking and it should begin garbage collection. When you have finished with a player just invoke the related Teardown to stop tracking
+`window.bitmovin.player.analytics.AdobeAnalytics` returns a teardown method that tells the system that you are done tracking and it should begin garbage collection. When you have finished with a player just invoke the related Teardown to stop tracking
 ```
 cleanup();
 ```

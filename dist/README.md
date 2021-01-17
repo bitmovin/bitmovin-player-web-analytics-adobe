@@ -13,7 +13,7 @@
 ### Configuration
 
 #### Heartbeat Config
-Once initializing a player instance, you need to pass it to the `BitmovinPlayerAdobeVhl` function to register it with your heartbeat account providing a configuration object as the first argument. All fields in the heartbeatConfig are required.
+Once initializing a player instance, you need to pass it to the `AdobeAnalytics` function to register it with your heartbeat account providing a configuration object as the first argument. All fields in the heartbeatConfig are required.
 
 ```
 const heartbeatConfig = ({
@@ -42,7 +42,7 @@ const heartbeatConfig = ({
 `ssl`: Boolean flag that indicates whether the heartbeat calls should be made over HTTPS.
 
 #### Data Projection Overrides
-The `BitmovinPlayerAdobeVhl` function also takes a Data Projection Object which is comprised of functions that will provide additional data Heartbeat may need. Not all values in this Object are required, however if your source has ads or chapters, you will need to implement the functions described under their headers.
+The `AdobeAnalytics` function also takes a Data Projection Object which is comprised of functions that will provide additional data Heartbeat may need. Not all values in this Object are required, however if your source has ads or chapters, you will need to implement the functions described under their headers.
 
 ##### Required
 
@@ -73,10 +73,10 @@ The `BitmovinPlayerAdobeVhl` function also takes a Data Projection Object which 
 Example can be viewed in `public/js/index.js`
 
 ### Registration
-To register a player to your Heartbeat server and begin tracking, invoke the `BitmovinPlayerAdobeVhl` function found in the player analytics
+To register a player to your Heartbeat server and begin tracking, invoke the `AdobeAnalytics` function found in the player analytics
 
 ```
-const cleanup = window.bitmovin.player.analytics.BitmovinPlayerAdobeVhl(
+const cleanup = window.bitmovin.player.analytics.AdobeAnalytics(
   heartbeatConfig,
   player,
   dataProjectionOverrides = {}
@@ -85,7 +85,7 @@ const cleanup = window.bitmovin.player.analytics.BitmovinPlayerAdobeVhl(
 Note, the registration of playback event callbacks with player should be done after registering the player instance to your Heartbeat server. Not doing so may cause errors.
 
 ### Cleanup
-`window.bitmovin.player.analytics.BitmovinPlayerAdobeVhl` returns a teardown method that tells the system that you are done tracking and it should begin garbage collection. When you have finished with a player just invoke the related Teardown to stop tracking
+`window.bitmovin.player.analytics.AdobeAnalytics` returns a teardown method that tells the system that you are done tracking and it should begin garbage collection. When you have finished with a player just invoke the related Teardown to stop tracking
 ```
 cleanup();
 ```
