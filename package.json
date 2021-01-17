@@ -4,6 +4,7 @@
   "description": "Adobe analytics integration for the Bitmovin Player",
   "main": "./dist/bitmovin-player-adobe-analytics.js",
   "scripts": {
+    "lint": "npx eslint \"./src/**/*.ts\"",
     "build": "webpack",
     "serve": "http-server",
     "wp-server": "webpack-dev-server --content-base public/",
