@@ -196,7 +196,7 @@ playerInstance.load(sourceConfig).then(
   }
 );
 
-window.bitmovin.player.analytics.BitmovinPlayerAdobeVhl(
+window.bitmovin.player.analytics.AdobeAnalytics(
   mediaConfigObj,
   playerInstance,
   toDataProjectionOverrides(playerInstance),
