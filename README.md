@@ -12,7 +12,7 @@ This package allows for the integration of the Abode Video Heartbeat Analytics s
 
 ## Usage
 ----------------
-`bitmovin-player-analytics-adobe.js` provides information for each video uniquely. To handle this each instance of the Bitmovin player needs to be passed to the analytics function. This function is exposed on the window at `window.bitmovin.player.analytics.AdobeAnalytics`.
+`dist/bitmovin-player-analytics-adobe.js` provides information for each video uniquely. To handle this each instance of the Bitmovin player needs to be passed to the analytics function. This function is exposed on the window at `window.bitmovin.player.analytics.AdobeAnalytics`.
 
 ### Configuration
 
