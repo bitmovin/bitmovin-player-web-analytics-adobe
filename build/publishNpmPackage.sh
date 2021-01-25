@@ -68,7 +68,7 @@ set +e
 NPM_LATEST=$(npm view --json @bitmovin/player-integration-adobe dist-tags | jq -r ".${NPM_TAG}")
 set -e
 
-echo "NPM latest branch $NPM_LATEST"
+echo "Latest version for tag '$NPM_TAG' on NPM: $NPM_LATEST"
 
 # We always publish the package with the latest) tag because there is no way to publish a package without
 # a tag (the default tag is always "latest"), and if the published version is older that the currently tagged version,
