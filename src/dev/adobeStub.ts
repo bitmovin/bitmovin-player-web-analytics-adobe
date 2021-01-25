@@ -6,7 +6,7 @@ import {
   AdBreakObject,
   ChapterObject,
   MediaHeartbeatDelegate,
-  MediaHeartbeatConfig
+  MediaHeartbeatConfig,
 } from '../types/Heartbeat';
 
 interface AdState extends AdObject {
@@ -38,7 +38,7 @@ const sessionDefault: session = {
   complete: false,
   seeking: false,
   buffering: false,
-  currentTime: 0
+  currentTime: 0,
 };
 
 interface FunctionMap {
@@ -74,7 +74,7 @@ const toEventMap = (heartbeat: MediaHeartbeatStub): FunctionMap => ({
     if (heartbeat.session.adBreak) {
       heartbeat.session.adBreak.ad = Object.assign(adObj, {
         metaData: metadata,
-        play: true
+        play: true,
       });
     } else {
       heartbeat.logUpdate('Ad attempted to start before AdBreak');
@@ -87,7 +87,7 @@ const toEventMap = (heartbeat: MediaHeartbeatStub): FunctionMap => ({
     }
     heartbeat.logUpdate('adComplete');
   },
-  //TODO: There is a race case here right now if you skip the last ad sometimes adBreakComplete sets the adBreak to undefined before adSkip logs
+  // TODO: There is a race case here right now if you skip the last ad sometimes adBreakComplete sets the adBreak to undefined before adSkip logs
   adSkip: () => {
     if (heartbeat.session.adBreak && heartbeat.session.adBreak.ad) {
       heartbeat.session.adBreak.ad.play = false;
@@ -110,7 +110,7 @@ const toEventMap = (heartbeat: MediaHeartbeatStub): FunctionMap => ({
   },
   chapterComplete: () => {
     heartbeat.logUpdate('chapterComplete');
-  }
+  },
 });
 
 export class MediaHeartbeatStub implements MediaHeartbeat {
@@ -121,16 +121,15 @@ export class MediaHeartbeatStub implements MediaHeartbeat {
     public config: MediaHeartbeatConfig,
     public appMeasurement: Object = {},
     public session: session = sessionDefault,
-    private interval = null
+    private interval = null,
   ) {
-    (this.getTime = mediaDelegate.getCurrentPlaybackTime),
-      (this.getQoSObject = mediaDelegate.getQoSObject);
+    (this.getTime = mediaDelegate.getCurrentPlaybackTime), (this.getQoSObject = mediaDelegate.getQoSObject);
   }
 
   logUpdate = (event: string) => {
     console.log({
       event,
-      session: this.session
+      session: this.session,
     });
   };
 
@@ -175,63 +174,37 @@ export class MediaHeartbeatStub implements MediaHeartbeat {
 
   trackEvent = (eventName: string, ...rest: any[]) => {
     const eventMap = toEventMap(this);
-    eventMap[eventName]
-      ? eventMap[eventName](...rest)
-      : error('Event Map Error: ' + eventName);
+    eventMap[eventName] ? eventMap[eventName](...rest) : error('Event Map Error: ' + eventName);
   };
 
-  static createQoSObject(
-    bitrate: number,
-    startUpTime: number,
-    fps: number,
-    droppedFrames: number
-  ): QoSObject {
+  static createQoSObject(bitrate: number, startUpTime: number, fps: number, droppedFrames: number): QoSObject {
     return {
       data: {
         bitrate,
         startUpTime,
         fps,
-        droppedFrames
-      }
+        droppedFrames,
+      },
     };
   }
 
-  static createAdObject(
-    name: string,
-    adId: string,
-    position: number,
-    duration: number
-  ): AdObject {
+  static createAdObject(name: string, adId: string, position: number, duration: number): AdObject {
     return {
       name,
       adId,
       position,
-      length
+      length,
     };
   }
 
-  static createMediaObject(
-    name: string,
-    mediaId: string,
-    length: number,
-    streamType: string
-  ): MediaObject {
+  static createMediaObject(name: string, mediaId: string, length: number, streamType: string): MediaObject {
     return { name, mediaId, length, streamType };
   }
-  static createAdBreakObject(
-    name: string,
-    position: number,
-    startTime: number
-  ): AdBreakObject {
+  static createAdBreakObject(name: string, position: number, startTime: number): AdBreakObject {
     return { name, position, startTime };
   }
 
-  static createChapterObject(
-    name: string,
-    position: number,
-    length: number,
-    startTime: number
-  ): ChapterObject {
+  static createChapterObject(name: string, position: number, length: number, startTime: number): ChapterObject {
     return { name, position, length, startTime };
   }
 }

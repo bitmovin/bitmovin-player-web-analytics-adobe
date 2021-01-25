@@ -9,3 +9,5 @@ docs/**
 **/public
 .prettier*
 .idea
+*.plain
+*.aes

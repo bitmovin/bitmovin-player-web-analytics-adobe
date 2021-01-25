@@ -1,0 +1,12 @@
+.idea/
+.vscode/
+build/
+public/
+src/
+test/
+codeship-services.yml
+codeship-steps.yml
+*.aes
+*.plain
+webpack.*.js
+tsconfig.json
