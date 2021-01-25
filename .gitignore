@@ -1,11 +1,13 @@
 .DS_Store
 .vscode
 **/node_modules
-**/bitmovinplayer-adobeanalytics.js
-**/bitmovinplayer-adobeanalytics*.tgz
+**/bitmovin-player-adobe-analytics.js
+**/bitmovin-player-adobe-analytics*.tgz
 **/*.map
 yarn-error.log
 docs/**
 **/public
 .prettier*
 .idea
+*.plain
+*.aes
