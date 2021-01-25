@@ -61,12 +61,12 @@ cd /bitmovin
 echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc
 chmod 0600 ~/.npmrc
 
-# We need to make sure the script doesn't stop if this command fails, as it fails for example 
-# for the very first publish as the package doesn't exist on npm yet. 
-# In this case, $NPM_LATEST will have 'null' as value.
-set +e
-NPM_LATEST=$(npm view --json @bitmovin/player-integration-adobe dist-tags | jq -r ".${NPM_TAG}")
-set -e
+# The '|| echo null' ensures that in case of a failure of the previous commands we still get a
+# proper value in the variable. This may happen
+# a) if the package doesn't exist yet (i.e. this is the first release being published), or
+# b) the tag doesn't exist yet (e.g. the first beta release but the package already exists).
+# In such a case, $NPM_LATEST will have 'null' as value.
+NPM_LATEST=$(npm view --json @bitmovin/player-integration-adobe dist-tags | jq -r ".${NPM_TAG}" || echo null)
 
 echo "Latest version for tag '$NPM_TAG' on NPM: $NPM_LATEST"
 
