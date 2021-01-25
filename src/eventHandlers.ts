@@ -5,22 +5,12 @@ import {
   MediaObject,
   AdBreakObject,
   AdObject,
-  ChapterObject
+  ChapterObject,
 } from './types/Heartbeat';
 
-import {
-  Teardown,
-  TeardownPlayerProjectionTuple,
-  PlayerWithItemProjection,
-  ChapterEvent
-} from './types/analytics';
+import { Teardown, TeardownPlayerProjectionTuple, PlayerWithItemProjection, ChapterEvent } from './types/analytics';
 
-import {
-  teardownAndRemove,
-  framerateMap,
-  toGetStreamType,
-  toGetManifest
-} from './utils/helpers';
+import { teardownAndRemove, framerateMap, toGetStreamType, toGetManifest } from './utils/helpers';
 
 import {
   PlayerAPI,
@@ -29,7 +19,7 @@ import {
   PlayerEventCallback,
   VideoPlaybackQualityChangedEvent,
   AdBreakEvent,
-  AdEvent
+  AdEvent,
 } from 'bitmovin-player';
 
 /**
@@ -39,7 +29,7 @@ import {
 const toRemovePlayerEventHandler = (
   player: PlayerAPI,
   eventType: PlayerEvent,
-  callback: PlayerEventCallback
+  callback: PlayerEventCallback,
 ): Teardown => () => player.off(eventType, callback);
 
 /**
@@ -49,7 +39,7 @@ const toRemovePlayerEventHandler = (
 export const addPlayerEventHandler = (
   player: PlayerAPI,
   eventType: PlayerEvent,
-  callback: PlayerEventCallback
+  callback: PlayerEventCallback,
 ): Teardown => {
   player.on(eventType, callback);
   return toRemovePlayerEventHandler(player, eventType, callback);
@@ -61,19 +51,12 @@ export const addPlayerEventHandler = (
  * @return The Second value of this tuple will be undefined until both events have fired
  * once fired it will be the delta between the two events. This value should not change once defined
  */
-export const toStartUpTime = (
-  player: PlayerAPI
-): TeardownPlayerProjectionTuple<number> => {
+export const toStartUpTime = (player: PlayerAPI): TeardownPlayerProjectionTuple<number> => {
   let deltaT;
   let teardowns = [];
-  const playCallback = (loadedTime: number) => () =>
-    (deltaT = Date.now() - loadedTime);
+  const playCallback = (loadedTime: number) => () => (deltaT = Date.now() - loadedTime);
 
-  const doThenTeardown = (
-    callback: () => void,
-    teardownArr: Teardown[],
-    index: number
-  ) => () => {
+  const doThenTeardown = (callback: () => void, teardownArr: Teardown[], index: number) => () => {
     callback();
     teardowns = teardownAndRemove(teardownArr, index);
   };
@@ -83,15 +66,11 @@ export const toStartUpTime = (
     teardowns[1] = addPlayerEventHandler(
       player,
       player.exports.PlayerEvent.Play,
-      doThenTeardown(playCallback(Date.now()), teardowns, 1)
+      doThenTeardown(playCallback(Date.now()), teardowns, 1),
     );
   };
 
-  teardowns[0] = addPlayerEventHandler(
-    player,
-    player.exports.PlayerEvent.SourceLoaded,
-    sourceLoadedCallback
-  );
+  teardowns[0] = addPlayerEventHandler(player, player.exports.PlayerEvent.SourceLoaded, sourceLoadedCallback);
 
   const teardownAndRemoveAll = () => {
     while (teardowns.length) {
@@ -109,17 +88,14 @@ export const toStartUpTime = (
  * due to buffering or frame times
  * the returning teardown stops tracking bitrate updates
  */
-export const toGetBitrate = (
-  player: PlayerAPI
-): TeardownPlayerProjectionTuple<number> => {
+export const toGetBitrate = (player: PlayerAPI): TeardownPlayerProjectionTuple<number> => {
   let bitrate = player.getVideoQuality().bitrate;
-  const videoPlaybackQualityChangedCallback = (
-    evt: VideoPlaybackQualityChangedEvent
-  ) => (bitrate = evt.targetQuality.bitrate);
+  const videoPlaybackQualityChangedCallback = (evt: VideoPlaybackQualityChangedEvent) =>
+    (bitrate = evt.targetQuality.bitrate);
   const removeVideoPlaybackQualityChangedCallback = addPlayerEventHandler(
     player,
     player.exports.PlayerEvent.VideoPlaybackQualityChanged,
-    videoPlaybackQualityChangedCallback
+    videoPlaybackQualityChangedCallback,
   );
   return [removeVideoPlaybackQualityChangedCallback, () => bitrate];
 };
@@ -140,10 +116,8 @@ export const toSourceFramerate = (player: PlayerAPI): number | undefined => {
 export const onVideoPlay = (handler: () => void) => () => {
   handler();
 };
-export const onVideoPlaying = (mediaHeartbeat: MediaHeartbeat) =>
-  mediaHeartbeat.trackPlay;
-export const onVideoPause = (mediaHeartbeat: MediaHeartbeat) =>
-  mediaHeartbeat.trackPause;
+export const onVideoPlaying = (mediaHeartbeat: MediaHeartbeat) => mediaHeartbeat.trackPlay;
+export const onVideoPause = (mediaHeartbeat: MediaHeartbeat) => mediaHeartbeat.trackPause;
 export const toOnVideoComplete = (finished: () => void) => () => {
   finished();
 };
@@ -153,101 +127,70 @@ export const toOnVideoComplete = (finished: () => void) => () => {
 export const checkChapter = (
   mediaHeartbeat: MediaHeartbeat,
   p: PlayerAPI,
-  toCreateChapterObject: PlayerWithItemProjection<ChapterObject, ChapterEvent>
+  toCreateChapterObject: PlayerWithItemProjection<ChapterObject, ChapterEvent>,
 ) => {
   let currentChapter;
   const playerSourceConfigMarkers = (p.getSource() as any).markers || [];
   const playerUIConfigMarkers =
-    p.getConfig().ui &&
-    p.getConfig().ui.metadata &&
-    p.getConfig().ui.metadata.markers
+    p.getConfig().ui && p.getConfig().ui.metadata && p.getConfig().ui.metadata.markers
       ? p.getConfig().ui.metadata.markers
       : [];
   const markers = playerSourceConfigMarkers.concat(playerUIConfigMarkers);
   const markersWithInterval: ChapterEvent[] = markers.map((m, position, a) =>
     Object.assign({}, m, {
       position,
-      interval:
-        position === a.length - 1
-          ? [m.time, Number.POSITIVE_INFINITY]
-          : [m.time, a[position + 1].time]
-    })
+      interval: position === a.length - 1 ? [m.time, Number.POSITIVE_INFINITY] : [m.time, a[position + 1].time],
+    }),
   );
 
   return ({ time }: PlaybackEvent) => {
     const newChapter = markersWithInterval.find(
-      ({ interval: [start, end] }) =>
-        start <= Math.floor(time) && Math.floor(time) < end
+      ({ interval: [start, end] }) => start <= Math.floor(time) && Math.floor(time) < end,
     );
     if (!newChapter || newChapter === currentChapter) return;
-    if (currentChapter && newChapter !== markersWithInterval[0])
-      mediaHeartbeat.trackEvent(Event.ChapterComplete);
-    //TODO: Deal with Event.ChapterSkip
+    if (currentChapter && newChapter !== markersWithInterval[0]) mediaHeartbeat.trackEvent(Event.ChapterComplete);
+    // TODO: Deal with Event.ChapterSkip
     currentChapter = newChapter;
-    mediaHeartbeat.trackEvent(
-      Event.ChapterStart,
-      toCreateChapterObject(p, newChapter)
-    );
+    mediaHeartbeat.trackEvent(Event.ChapterStart, toCreateChapterObject(p, newChapter));
   };
 };
 
 // Buffering
-export const toOnBufferStart = (mediaHeartbeat: MediaHeartbeat) => () =>
-  mediaHeartbeat.trackEvent(Event.BufferStart);
+export const toOnBufferStart = (mediaHeartbeat: MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.BufferStart);
 
-export const toOnBufferEnd = (mediaHeartbeat: MediaHeartbeat) => () =>
-  mediaHeartbeat.trackEvent(Event.BufferComplete);
+export const toOnBufferEnd = (mediaHeartbeat: MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.BufferComplete);
 
 // Seeking
-export const toOnSeekStart = (mediaHeartbeat: MediaHeartbeat) => () =>
-  mediaHeartbeat.trackEvent(Event.SeekStart);
+export const toOnSeekStart = (mediaHeartbeat: MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.SeekStart);
 
-export const toOnSeekEnd = (mediaHeartbeat: MediaHeartbeat) => () =>
-  mediaHeartbeat.trackEvent(Event.SeekComplete);
+export const toOnSeekEnd = (mediaHeartbeat: MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.SeekComplete);
 
 // Ads
 export const toOnAdBreakStart = (
   mediaHeartbeat: MediaHeartbeat,
   player: PlayerAPI,
-  toCreateAdBreakObject: PlayerWithItemProjection<AdBreakObject, AdBreakEvent>
-) => (evt: AdBreakEvent) =>
-  mediaHeartbeat.trackEvent(
-    Event.AdBreakStart,
-    toCreateAdBreakObject(player, evt)
-  );
+  toCreateAdBreakObject: PlayerWithItemProjection<AdBreakObject, AdBreakEvent>,
+) => (evt: AdBreakEvent) => mediaHeartbeat.trackEvent(Event.AdBreakStart, toCreateAdBreakObject(player, evt));
 
 export const toOnAdStart = (
   mediaHeartbeat: MediaHeartbeat,
   player: PlayerAPI,
-  toCreateAdObject: PlayerWithItemProjection<AdObject, AdEvent>
-) => (evt: AdEvent) =>
-  mediaHeartbeat.trackEvent(Event.AdStart, toCreateAdObject(player, evt));
+  toCreateAdObject: PlayerWithItemProjection<AdObject, AdEvent>,
+) => (evt: AdEvent) => mediaHeartbeat.trackEvent(Event.AdStart, toCreateAdObject(player, evt));
 
-export const toOnAdComplete = (mediaHeartbeat: MediaHeartbeat) => () =>
-  mediaHeartbeat.trackEvent(Event.AdComplete);
+export const toOnAdComplete = (mediaHeartbeat: MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.AdComplete);
 
-export const toOnAdSkip = (mediaHeartbeat: MediaHeartbeat) => () =>
-  mediaHeartbeat.trackEvent(Event.AdSkip);
+export const toOnAdSkip = (mediaHeartbeat: MediaHeartbeat) => () => mediaHeartbeat.trackEvent(Event.AdSkip);
 
-export const toOnAdBreakComplete = (
-  mediaHeartbeat: MediaHeartbeat,
-  player: PlayerAPI,
-  finished: () => void
-) => () => {
+export const toOnAdBreakComplete = (mediaHeartbeat: MediaHeartbeat, player: PlayerAPI, finished: () => void) => () => {
   mediaHeartbeat.trackEvent(Event.AdBreakComplete);
 };
 
 // QoS
-export const toOnVideoQualityChanged = (
-  mediaHeartbeat: MediaHeartbeat,
-  mediaDelegate: MediaHeartbeatDelegate
-) => () =>
+export const toOnVideoQualityChanged = (mediaHeartbeat: MediaHeartbeat, mediaDelegate: MediaHeartbeatDelegate) => () =>
   mediaHeartbeat.trackEvent(Event.BitrateChange, mediaDelegate.getQoSObject());
-export const toOnError = (mediaHeartbeat: MediaHeartbeat) => evt =>
-  mediaHeartbeat.trackError(evt);
-export const toOnAdError = (mediaHeartbeat: MediaHeartbeat) => evt =>
-  mediaHeartbeat.trackError(evt);
+export const toOnError = (mediaHeartbeat: MediaHeartbeat) => evt => mediaHeartbeat.trackError(evt);
+export const toOnAdError = (mediaHeartbeat: MediaHeartbeat) => evt => mediaHeartbeat.trackError(evt);
 
 // Session end
-export const toOnVideoDestroy = (mediaHeartbeat: MediaHeartbeat) => () =>
-  mediaHeartbeat.trackSessionEnd;
+export const toOnVideoDestroy = (mediaHeartbeat: MediaHeartbeat) => () => mediaHeartbeat.trackSessionEnd;

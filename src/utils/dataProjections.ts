@@ -23,9 +23,7 @@ const fromVideoPlaybackQualityWhenValid = (player: PlayerAPI) => {
   // TODO: Verify that
   // a) querySelector will be available in all target browser &
   // b) we can assume that, if getFigure() is available, so is the video tag. (CJP)
-  const videoEl: HTMLVideoElement = player
-    .getContainer()
-    .querySelector('video#bitmovinplayer-video-player');
+  const videoEl: HTMLVideoElement = player.getContainer().querySelector('video#bitmovinplayer-video-player');
   if (!videoEl) return player.getDroppedVideoFrames();
   return videoEl.getVideoPlaybackQuality().droppedVideoFrames;
 };
@@ -42,10 +40,7 @@ export const toVideoDuration = (player: PlayerAPI) => player.getDuration();
 export const toVideoStreamType = (player: PlayerAPI) =>
   player.isLive() ? HeartbeatStreamType.LIVE : HeartbeatStreamType.VOD;
 
-export const toAdBreakNameDefault = (
-  player: PlayerAPI,
-  adBreakEvent: AdBreakEvent
-) => {
+export const toAdBreakNameDefault = (player: PlayerAPI, adBreakEvent: AdBreakEvent) => {
   const duration = player.getDuration();
   const scheduleTime = adBreakEvent.adBreak.scheduleTime;
   if (scheduleTime === 0) return 'preroll';
@@ -53,10 +48,7 @@ export const toAdBreakNameDefault = (
   return 'midroll';
 };
 
-export const toAdBreakPositionDefault = (
-  player: PlayerAPI,
-  adBreakEvent: AdBreakEvent
-) => {
+export const toAdBreakPositionDefault = (player: PlayerAPI, adBreakEvent: AdBreakEvent) => {
   const duration = player.getDuration();
   const scheduleTime = adBreakEvent.adBreak.scheduleTime;
   if (scheduleTime === 0) return 1;
@@ -64,15 +56,9 @@ export const toAdBreakPositionDefault = (
   return 2;
 };
 
-export const toAdBreakStartTime = (
-  player: PlayerAPI,
-  adBreakEvent: AdBreakEvent
-) => adBreakEvent.adBreak.scheduleTime;
+export const toAdBreakStartTime = (player: PlayerAPI, adBreakEvent: AdBreakEvent) => adBreakEvent.adBreak.scheduleTime;
 
-export const toAdPositionDefault = (
-  player: PlayerAPI,
-  adStartedEvent: AdEvent
-) => {
+export const toAdPositionDefault = (player: PlayerAPI, adStartedEvent: AdEvent) => {
   const activeAdsArray = player.ads.getActiveAdBreak().ads;
   const index = activeAdsArray.findIndex(ad => ad.id === adStartedEvent.ad.id);
   return index;
@@ -86,16 +72,11 @@ export const toAdLength = (player: PlayerAPI, adStartedEvent: AdEvent) => {
   return adDuration;
 };
 
-export const toChapterNameDefault = (player: PlayerAPI, e: ChapterEvent) =>
-  e.title;
+export const toChapterNameDefault = (player: PlayerAPI, e: ChapterEvent) => e.title;
 
 export const toChapterLengthDefault = (player: PlayerAPI, e: ChapterEvent) =>
-  e.interval[1] === Number.POSITIVE_INFINITY
-    ? player.getDuration() - e.interval[0]
-    : e.interval[1] - e.interval[0];
+  e.interval[1] === Number.POSITIVE_INFINITY ? player.getDuration() - e.interval[0] : e.interval[1] - e.interval[0];
 
-export const toChapterPositionDefault = (player: PlayerAPI, e: ChapterEvent) =>
-  e.position;
+export const toChapterPositionDefault = (player: PlayerAPI, e: ChapterEvent) => e.position;
 
-export const toChapterStartTimeDefault = (player: PlayerAPI, e: ChapterEvent) =>
-  e.time;
+export const toChapterStartTimeDefault = (player: PlayerAPI, e: ChapterEvent) => e.time;
