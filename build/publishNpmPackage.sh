@@ -61,7 +61,12 @@ cd /bitmovin
 echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc
 chmod 0600 ~/.npmrc
 
+# We need to make sure the script doesn't stop if this command fails, as it fails for example 
+# for the very first publish as the package doesn't exist on npm yet. 
+# In this case, $NPM_LATEST will have 'null' as value.
+set +e
 NPM_LATEST=$(npm view --json @bitmovin/player-integration-adobe dist-tags | jq -r ".${NPM_TAG}")
+set -e
 
 echo "NPM latest branch $NPM_LATEST"
 
