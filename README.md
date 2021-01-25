@@ -1,37 +1,25 @@
 # bitmovin-player-analytics-adobe
 ----
-This package allows for the integration of your Abode Video Heartbeat Analytics system with your Bitmovin Player.
+This package allows for the integration of the Abode Video Heartbeat Analytics system with the Bitmovin Player.
 
 ## Requirements
 -----------------
 1. Adobe Experience Cloud account
 1. Bitmovin account
-1. Node version >= v6.11.5
 1. Video Heartbeat library = v2.0.2
 1. AppMeasurement.js from Adobe Experience Cloud
 1. VisitorAPI.js from Adobe Experience Cloud
 
-## Getting started
-----------------
-1. Clone this git repository.
-2. Visit [Video Heartbeat Library](https://github.com/Adobe-Marketing-Cloud/video-heartbeat-v2/releases/tag/js-v2.0.2) to download `VideoHeartbeatLibrary-js-v2.0.2.zip`.
-3. Copy `VideoHeartbeat.min.js` from the libs directory in the Video Heartbeat Library to your project.
-4. Download `AppMeasurement.js` and `VisitorAPI.js` from your Adobe Experience Cloud account and place them in your project.
-5. Install required packages with `npm ci`.
-6. Build project with `npm run build`.
-7. Compiled file can be found at `public\js\bitmovin-adobeanalytics.js`.
-8. Include the built file and the 3 Adobe Heartbeat JavaScript files in the body tag your root html file.
-
 ## Usage
 ----------------
-bitmovin-player-analytics-adobe provides information for each video uniquely. To handle this each instance of the Bitmovin player needs to be passed to the analytics function. This function is exposed on the window at `window.bitmovin.player.analytics.HeartbeatAnalytics`
+`dist/bitmovin-player-analytics-adobe.js` provides information for each video uniquely. To handle this each instance of the Bitmovin player needs to be passed to the analytics function. This function is exposed on the window at `window.bitmovin.player.analytics.AdobeAnalytics`.
 
 ### Configuration
 
 #### Heartbeat Config
-Once initializing a player instance, you need to pass it to the HeartbeatAnalytics function to register it with your heartbeat account providing a configuration object as the first argument. All fields in the heartbeatConfig are required.
+Once initializing a player instance, you need to pass it to the `AdobeAnalytics` function to register it with your heartbeat account providing a configuration object as the first argument. All fields in the heartbeatConfig are required.
 
-```
+```js
 const heartbeatConfig = ({
   trackingServer: "",
   ovp: "",
@@ -43,9 +31,9 @@ const heartbeatConfig = ({
 })
 ```
 
-`trackingServer` : Defines the server for tracking media heartbeats. This is different from your analytics tracking server.
+`trackingServer`: Defines the server for tracking media heartbeats. This is different from your analytics tracking server.
 
-`ovp` : 	Name of the online video platform through which content gets distributed.
+`ovp`: 	Name of the online video platform through which content gets distributed.
 
 `playerName`: Name of the video player in use. E.g.: "AVPlayer", "HTML5 Player", "My Custom VideoPlayer".
 
@@ -58,41 +46,39 @@ const heartbeatConfig = ({
 `ssl`: Boolean flag that indicates whether the heartbeat calls should be made over HTTPS.
 
 #### Data Projection Overrides
-The Heartbeat Analytics Function also takes a Data Projection Object which is comprised of functions that will provide additional data Heartbeat may need. Not all values in this Object are required, however if your source has ads or chapters, you will need to implement the functions described under their headers.
+The `AdobeAnalytics` function also takes a Data Projection Object which is comprised of functions that will provide additional data Heartbeat may need. Not all values in this object are required, however if your source has ads or chapters, you will need to implement the functions described under their headers.
 
 ##### Required
 
 | Key               | Signature     | Required    | Description |
 | ----------------- |:-------------:|:-----------:|-----------:|
-| toVideoUID        | (player:PlayerAPI) => string | 	YES | Returns the UID for the Player|
-| toCustomMetadata  | (player:PlayerAPI) => string | 	YES | Returns the custom metadata for the Playback Session|
+| `toVideoUID`      |`(player:PlayerAPI) => string`| 	YES | Returns the UID for the Player|
+| `toCustomMetadata`|`(player:PlayerAPI) => string`| 	YES | Returns the custom metadata for the Playback Session|
 
 ##### Ads
 
 | Key               | Signature     | Required    | Description |
 | ----------------- |:-------------:|:-----------:|-----------:|
-| toAdBreakName     | (player:PlayerAPI, adBreakEvent:AdBreakEvent) => string | YES | Returns the name of the current AdBreak|
-| toAdBreakPosition | (player:PlayerAPI, adBreakEvent:AdBreakEvent) => number | YES | Returns the number of the current AdBreak|
-| toAdName          | (player:PlayerAPI, adEvent:AdEvent) => string | YES | Returns the Name of the current Ad|
-| toAdId            | (player:PlayerAPI, adEvent:AdEvent) => string | YES | Returns the ID for the current Ad|
-| toAdPosition      | (player:PlayerAPI, adEvent:AdEvent) => number | YES | Returns the number of the current Ad within current AdBreak|
+|`toAdBreakName`    |`(player:PlayerAPI, adBreakEvent:AdBreakEvent) => string`| YES | Returns the name of the current AdBreak|
+|`toAdBreakPosition`|`(player:PlayerAPI, adBreakEvent:AdBreakEvent) => number` | YES | Returns the number of the current AdBreak|
+|`toAdName`         |`(player:PlayerAPI, adEvent:AdEvent) => string` | YES | Returns the Name of the current Ad|
+|`toAdId`           |`(player:PlayerAPI, adEvent:AdEvent) => string` | YES | Returns the ID for the current Ad|
+|`toAdPosition`     |`(player:PlayerAPI, adEvent:AdEvent) => number` | YES | Returns the number of the current Ad within current AdBreak|
 
 ##### Chapters
 
 | Key               | Signature     | Required    | Description |
 | ----------------- |:-------------:|:-----------:|-----------:|
-| toChapterName     | (player:PlayerAPI, chapterEvent:ChapterEvent) => string | 	NO | Returns the name of the current Chapter |
-| toChapterPosition | (player:PlayerAPI, chapterEvent:ChapterEvent) => number | 	NO | Returns the number of the current Chapter|
-| toChapterLength   | (player:PlayerAPI, chapterEvent:ChapterEvent) => number | 	NO | Returns the length of the chapter in seconds|
-| toChapterStartTime| (player:PlayerAPI, chapterEvent:ChapterEvent) => number | 	NO | Returns the start time in seconds of the current chapter|
-
-Example can be viewed in `public/js/index.js`
+|`toChapterName`    |`(player:PlayerAPI, chapterEvent:ChapterEvent) => string`| 	NO | Returns the name of the current Chapter |
+|`toChapterPosition`|`(player:PlayerAPI, chapterEvent:ChapterEvent) => number`| 	NO | Returns the number of the current Chapter|
+|`toChapterLength`  |`(player:PlayerAPI, chapterEvent:ChapterEvent) => number`| 	NO | Returns the length of the chapter in seconds|
+|`toChapterStartTime`|`(player:PlayerAPI, chapterEvent:ChapterEvent) => number`| 	NO | Returns the start time in seconds of the current chapter |
 
 ### Registration
-To register a player to your Heartbeat server and begin tracking, invoke the HeartbeatAnalytics function found in the player analytics
+To register a player to your Heartbeat server and begin tracking, invoke the `AdobeAnalytics` function found in the player analytics:
 
-```
-const cleanup = window.bitmovin.player.analytics.HeartbeatAnalytics(
+```js
+const cleanup = window.bitmovin.player.analytics.AdobeAnalytics(
   heartbeatConfig,
   player,
   dataProjectionOverrides = {}
@@ -101,8 +87,8 @@ const cleanup = window.bitmovin.player.analytics.HeartbeatAnalytics(
 Note, the registration of playback event callbacks with player should be done after registering the player instance to your Heartbeat server. Not doing so may cause errors.
 
 ### Cleanup
-`window.bitmovin.player.analytics.HeartbeatAnalytics` returns a teardown method that tells the system that you are done tracking and it should begin garbage collection. When you have finished with a player just invoke the related Teardown to stop tracking
-```
+`window.bitmovin.player.analytics.AdobeAnalytics` returns a teardown method that tells the system that you are done tracking and it should begin garbage collection. When you have finished with a player just invoke the related Teardown to stop tracking
+```js
 cleanup();
 ```
 
@@ -113,8 +99,15 @@ Note it is up to you to call teardown whenever you would destroy the player. Not
 
 ### Installation
 
-1. Follow the getting started instructions
-2. Edit the current example project to include your heartbeat settings
+1. Clone this git repository.
+1. Visit [Video Heartbeat Library](https://github.com/Adobe-Marketing-Cloud/video-heartbeat-v2/releases/tag/js-v2.0.2) to download `VideoHeartbeatLibrary-js-v2.0.2.zip`.
+1. Copy `VideoHeartbeat.min.js` from the libs directory in the Video Heartbeat Library to your project.
+1. Download `AppMeasurement.js` and `VisitorAPI.js` from your Adobe Experience Cloud account and place them in your project.
+1. Edit the current example project to include your heartbeat settings
+1. Install required packages with `npm ci`.
+1. Build project with `npm run build`.
+1. Compiled file can be found at `public\js\bitmovin-player-adobe-analytics.js`.
+1. Include the built file and the 3 Adobe Heartbeat JavaScript files in the body tag of the html file.
 
 ### Running the project
 

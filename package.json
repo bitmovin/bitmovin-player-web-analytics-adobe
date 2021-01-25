@@ -1,35 +1,49 @@
 {
-  "name": "bitmovin-player-analytics-adobe",
+  "name": "@bitmovin/player-integration-adobe",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Adobe analytics integration for the Bitmovin Player",
+  "main": "./dist/bitmovin-player-adobe-analytics.js",
+  "private": false,
   "scripts": {
+    "lint": "npx eslint \"./src/**/*.ts\"",
     "build": "webpack",
-    "serve": "http-server",
     "wp-server": "webpack-dev-server --content-base public/",
     "start": "concurrently --kill-others \"webpack --watch -d\" \"npm run wp-server\"",
     "docs": "typedoc --out docs/ --target ES6 --mode modules --module commonjs src/bitmovin-heartbeat.ts ",
     "format": "prettier --single-quote --parser typescript --write 'src/**/*.{ts,js}' 'test/**/*.{ts,js}'",
     "precommit": "pretty-quick --staged",
-    "prepare-release": "webpack --mode='production' --devtool='-' && cp public/js/bitmovinplayer-adobeanalytics.js dist/ && npm run docs && cd dist && npm pack"
+    "prepare-release": "webpack --mode='production' --devtool='-' && cp public/js/bitmovin-player-adobe-analytics.js dist/ && npm run docs",
+    "prepublishOnly": "npm run prepare-release"
   },
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "Bitmovin"
+  },
+  "license": "MIT",
+  "homepage": "https://bitmovin.com",
+  "keywords": [
+    "adobe analytics",
+    "adobe vhl",
+    "adobe heartbeat",
+    "bitmovin player",
+    "video player"
+  ],
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "@typescript-eslint/parser": "^4.13.0",
     "bitmovin-player": "^8.31.0",
     "bitmovin-player-ui": "^3.10.0",
     "concurrently": "^5.1.0",
+    "dts-gen": "^0.6.0",
+    "eslint": "^7.18.0",
+    "eslint-config-prettier": "^7.1.0",
     "husky": "^4.2.3",
     "prettier": "^1.19.1",
     "pretty-quick": "^1.11.1",
     "ts-loader": "^4.5.0",
-    "typescript": "^2.9.2",
+    "typedoc": "^0.16.10",
+    "typescript": "^4.1.3",
     "webpack": "^4.41.6",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
-  },
-  "dependencies": {
-    "dts-gen": "^0.6.0",
-    "typedoc": "^0.16.10"
   }
 }

@@ -7,7 +7,7 @@ import {
   ChapterObject,
   MediaHeartbeatDelegate,
   MediaHeartbeatConfig,
-  Event
+  Event,
 } from '../types/Heartbeat';
 
 interface AdState extends AdObject {
@@ -39,7 +39,7 @@ const sessionDefault: session = {
   complete: false,
   seeking: false,
   buffering: false,
-  currentTime: 0
+  currentTime: 0,
 };
 
 interface FunctionMap {
@@ -79,7 +79,7 @@ const toEventMap = (heartbeat: MediaHeartbeatPass): FunctionMap => ({
     heartbeat.logDebug('adComplete');
     heartbeat.mediaHeartbeatReal.trackEvent(Event.AdComplete);
   },
-  //TODO: There is a race case here right now if you skip the last ad sometimes adBreakComplete sets the adBreak to undefined before adSkip logs
+  // TODO: There is a race case here right now if you skip the last ad sometimes adBreakComplete sets the adBreak to undefined before adSkip logs
   adSkip: () => {
     heartbeat.logDebug('adSkip');
     heartbeat.mediaHeartbeatReal.trackEvent(Event.AdSkip);
@@ -99,24 +99,22 @@ const toEventMap = (heartbeat: MediaHeartbeatPass): FunctionMap => ({
   chapterComplete: () => {
     heartbeat.logDebug('chapterComplete');
     heartbeat.mediaHeartbeatReal.trackEvent(Event.ChapterComplete);
-  }
+  },
 });
 
 export interface MediaHeartbeatPass extends MediaHeartbeat {
   mediaHeartbeatReal: MediaHeartbeat;
 }
+
+// eslint-disable-next-line no-redeclare
 export class MediaHeartbeatPass implements MediaHeartbeatPass {
   constructor(
     public mediaDelegate: MediaHeartbeatDelegate,
     public config: MediaHeartbeatConfig,
     public appMeasurement: Object = {},
-    public enableDebugLogs = false
+    public enableDebugLogs = false,
   ) {
-    this.mediaHeartbeatReal = new MediaHeartbeat(
-      mediaDelegate,
-      config,
-      appMeasurement
-    );
+    this.mediaHeartbeatReal = new MediaHeartbeat(mediaDelegate, config, appMeasurement);
   }
 
   logDebug = (event: string) => {
@@ -157,8 +155,6 @@ export class MediaHeartbeatPass implements MediaHeartbeatPass {
 
   trackEvent = (eventName: string, ...rest: any[]) => {
     const eventMap = toEventMap(this);
-    eventMap[eventName]
-      ? eventMap[eventName](...rest)
-      : error('Event Map Error: ' + eventName);
+    eventMap[eventName] ? eventMap[eventName](...rest) : error('Event Map Error: ' + eventName);
   };
 }
