@@ -74,7 +74,10 @@ echo "Latest version for tag '$NPM_TAG' on NPM: $NPM_LATEST"
 # a tag (the default tag is always "latest"), and if the published version is older that the currently tagged version,
 # we have to revert the tag afterwards to avoid version regressions.
 echo "publishing ${VERSION} to NPM with "${NPM_TAG}" tag (current tagged version is ${NPM_LATEST})"
-npm publish --tag ${NPM_TAG}
+
+# Scoped packages are per default private, unless they are explicitly set to public (at least for the initial release)
+# See https://docs.npmjs.com/cli/v6/commands/npm-access for details.
+npm publish --tag ${NPM_TAG} --access=public
 
 if [[ ${NPM_LATEST} == "null" ]]; then
   echo "New tag as no version was published with it before, nothing else to do here"
