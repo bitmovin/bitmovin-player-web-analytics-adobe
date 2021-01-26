@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Adobe analytics integration for the Bitmovin Player",
   "main": "./dist/bitmovin-player-adobe-analytics.js",
-  "private": false,
   "scripts": {
     "lint": "npx eslint \"./src/**/*.ts\"",
     "build": "webpack",
