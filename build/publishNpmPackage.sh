@@ -47,7 +47,7 @@ fi
 ## Check if this version was already published.
 ## If something went wrong during a later build step and we re-run the release
 ## after fixing the problem, the npm publish would fail the build.
-IS_PUBLISHED=$(npm view @bitmovin/player-integration-adobe@${VERSION} dist-tags)
+IS_PUBLISHED=$(npm view @bitmovin/player-integration-adobe@${VERSION} dist-tags || echo "")
 
 if [[ ${IS_PUBLISHED} ]]; then
     echo "WARNING ${VERSION} is already published, skipping this step"
