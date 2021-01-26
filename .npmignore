@@ -8,5 +8,7 @@ codeship-services.yml
 codeship-steps.yml
 *.aes
 *.plain
+*.encrypted
 webpack.*.js
 tsconfig.json
+*.eslintrc.js
