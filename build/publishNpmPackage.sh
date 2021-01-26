@@ -49,7 +49,7 @@ fi
 ## after fixing the problem, the npm publish would fail the build.
 IS_PUBLISHED=$(npm view @bitmovin/player-integration-adobe@${VERSION} dist-tags || echo "")
 
-if [[ ${IS_PUBLISHED} ]]; then
+if [[ "${IS_PUBLISHED}" != "" ]]; then
     echo "WARNING ${VERSION} is already published, skipping this step"
     exit 0
 else
