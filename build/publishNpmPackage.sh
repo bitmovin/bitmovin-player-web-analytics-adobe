@@ -61,9 +61,14 @@ cd /bitmovin
 echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc
 chmod 0600 ~/.npmrc
 
-NPM_LATEST=$(npm view --json @bitmovin/player-integration-adobe dist-tags | jq -r ".${NPM_TAG}")
+# The '|| echo null' ensures that in case of a failure of the previous commands we still get a
+# proper value in the variable. This may happen
+# a) if the package doesn't exist yet (i.e. this is the first release being published), or
+# b) the tag doesn't exist yet (e.g. the first beta release but the package already exists).
+# In such a case, $NPM_LATEST will have 'null' as value.
+NPM_LATEST=$(npm view --json @bitmovin/player-integration-adobe dist-tags | jq -r ".${NPM_TAG}" || echo null)
 
-echo "NPM latest branch $NPM_LATEST"
+echo "Latest version for tag '$NPM_TAG' on NPM: $NPM_LATEST"
 
 # We always publish the package with the latest) tag because there is no way to publish a package without
 # a tag (the default tag is always "latest"), and if the published version is older that the currently tagged version,
