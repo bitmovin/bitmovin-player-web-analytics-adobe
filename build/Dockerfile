@@ -1,5 +1,5 @@
 # Start from a debian-based recent LTS node version
-FROM node:lts-slim
+FROM node:16-slim
 
 # Install required tools and dependencies
 RUN apt-get update && \
