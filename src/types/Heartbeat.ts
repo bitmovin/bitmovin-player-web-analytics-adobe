@@ -136,7 +136,7 @@ interface ADB {
 
 // TODO avoid redeclaration
 /* eslint-disable no-redeclare */
-declare const adb: ADB;
+const adb: ADB = (window as any).ADB;
 export const MediaHeartbeat = adb.va.MediaHeartbeat;
 export const MediaHeartbeatConfig = adb.va.MediaHeartbeatConfig;
 export const MediaHeartbeatDelegate = adb.va.MediaHeartbeatDelegate;
