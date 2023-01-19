@@ -1,6 +1,6 @@
 {
   "name": "@bitmovin/player-integration-adobe",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Adobe analytics integration for the Bitmovin Player",
   "main": "./dist/bitmovin-player-adobe-analytics.js",
   "scripts": {
