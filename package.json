@@ -3,8 +3,12 @@
   "version": "1.0.1",
   "description": "Adobe analytics integration for the Bitmovin Player",
   "main": "./dist/bitmovin-player-adobe-analytics.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bitmovin/bitmovin-player-web-analytics-adobe.git"
+  },
   "scripts": {
-    "lint": "npx eslint \"./src/**/*.ts\"",
+    "lint": "npx eslint \"./src/**/*.ts\" && kacl lint",
     "build": "webpack",
     "wp-server": "webpack-dev-server --content-base public/",
     "start": "concurrently --kill-others \"webpack --watch -d\" \"npm run wp-server\"",
@@ -36,6 +40,7 @@
     "eslint": "^7.18.0",
     "eslint-config-prettier": "^7.1.0",
     "husky": "^4.2.3",
+    "kacl": "^1.1.1",
     "prettier": "^1.19.1",
     "pretty-quick": "^1.11.1",
     "ts-loader": "^4.5.0",
