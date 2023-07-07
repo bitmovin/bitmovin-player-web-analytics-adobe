@@ -1,6 +1,22 @@
-# bitmovin-player-analytics-adobe
-----
-This package allows for the integration of the Abode Video Heartbeat Analytics system with the Bitmovin Player.
+# Bitmovin Player Adobe Analytics Integration
+This is an open-source project to enable the use of a third-party component (Abode Video Heartbeat) with the Bitmovin Player Web SDK.
+
+## Maintenance and Update
+This project is not part of a regular maintenance or update schedule. For any update requests, please take a look at the guidance further below.
+
+## Contributions to this project
+As an open-source project, we are pleased to accept any and all changes, updates and fixes from the community wishing to use this project. Please see [CONTRIBUTING.md](CONTRIBUTING.md) for more details on how to contribute.
+
+## Reporting player bugs
+If you come across a bug related to the player, please raise this through your support ticketing system.
+
+## Need more help?
+Should you want some help updating this project (update, modify, fix or otherwise) and cant contribute for any reason, please raise your request to your bitmovin account team, who can discuss your request.
+
+## Support and SLA Disclaimer
+As an open-source project and not a core product offering, any request, issue or query related to this project is excluded from any SLA and Support terms that a customer might have with either Bitmovin or another third-party service provider or Company contributing to this project. Any and all updates are purely at the contributor's discretion.
+
+Thank you for your contributions!
 
 ## Requirements
 -----------------
@@ -133,12 +149,6 @@ This project uses TypeDoc to generate docs. After Installation you can create yo
 npm run doc
 ```
 this will generated a `doc\` folder in the root directory containing the documentation
-
-### Prettier
-This project used Prettier for style consistency. This is built into the commit hook, however it may also be run manually through
-```
-npm run format
-```
 
 ### adobeStub
 
