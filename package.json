@@ -15,7 +15,7 @@
     "docs": "typedoc --out docs/ --target ES6 --mode modules --module commonjs src/bitmovin-heartbeat.ts ",
     "format": "prettier --single-quote --parser typescript --write 'src/**/*.{ts,js}' 'test/**/*.{ts,js}'",
     "precommit": "pretty-quick --staged",
-    "prepare-release": "webpack --mode='production' --devtool='-' && cp public/js/bitmovin-player-adobe-analytics.js dist/ && npm run docs",
+    "prepare-release": "webpack --mode='production' --devtool='-' && mkdir -p dist && cp public/js/bitmovin-player-adobe-analytics.js dist/ && npm run docs",
     "prepublishOnly": "npm run prepare-release"
   },
   "author": {
